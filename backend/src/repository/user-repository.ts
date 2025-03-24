@@ -31,9 +31,21 @@ export async function deactivateRepository(id: string) {
 }
 
 export async function getUserRepository({ email, cpf }: userData) {
-  return await prisma.user.findFirst({
+  return await prisma.user.findUnique({
     where: {
-      OR: [{ email }, { cpf }],
+      email,
+      cpf,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      password: true,
+      cpf: true,
+      avatar: true,
+      xp: true,
+      level: true,
+      achievements: true,
     },
   });
 }
