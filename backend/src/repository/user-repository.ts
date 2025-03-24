@@ -13,12 +13,6 @@ export async function getByIdRepository(id: string) {
   });
 }
 
-export async function createUserRepository(data: userData) {
-  return await prisma.user.create({
-    data,
-  });
-}
-
 export async function updateRepository(data: userData, id: string) {
   return await prisma.user.update({
     data,
@@ -33,5 +27,19 @@ export async function deactivateRepository(id: string) {
     where: {
       id,
     },
+  });
+}
+
+export async function getUserRepository({ email, cpf }: userData) {
+  return await prisma.user.findFirst({
+    where: {
+      OR: [{ email }, { cpf }],
+    },
+  });
+}
+
+export async function createUserRepository(data: userData) {
+  return await prisma.user.create({
+    data,
   });
 }
