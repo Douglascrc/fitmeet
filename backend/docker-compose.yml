@@ -8,3 +8,13 @@ services:
       POSTGRES_USER: bootcamp
       POSTGRES_PASSWORD: bootcamp
       POSTGRES_DB: bootcamp
+  localstack:
+    image: localstack/localstack
+    ports:
+      - 4566:4566
+    container_name: localstack
+    environment:
+      SERVICES: s3
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY: test
+      AWS_SECRET_ACCESS_KEY: test
