@@ -1,7 +1,7 @@
 import prisma from "../prisma/prisma-client";
 import userData from "../types/user-creation";
 
-export async function getUserAuth(userId: string) {
+export async function getUserAuthRepository(userId: string) {
   return await prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -13,6 +13,7 @@ export async function getUserAuth(userId: string) {
       xp: true,
       level: true,
       achievements: true,
+      deletedAt: true,
     },
   });
 }
@@ -35,10 +36,9 @@ export async function updateRepository(data: userData, id: string) {
 }
 
 export async function deactivateRepository(id: string) {
-  return await prisma.user.delete({
-    where: {
-      id,
-    },
+  return await prisma.user.update({
+    where: { id },
+    data: { deletedAt: new Date() },
   });
 }
 
