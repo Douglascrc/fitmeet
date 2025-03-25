@@ -1,8 +1,20 @@
 import prisma from "../prisma/prisma-client";
 import userData from "../types/user-creation";
 
-export async function getAllRepository() {
-  return await prisma.user.findMany();
+export async function getUserAuth(userId: string) {
+  return await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      cpf: true,
+      avatar: true,
+      xp: true,
+      level: true,
+      achievements: true,
+    },
+  });
 }
 
 export async function getByIdRepository(id: string) {
@@ -36,16 +48,14 @@ export async function getUserRepository({ email, cpf }: userData) {
       email,
       cpf,
     },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      password: true,
-      cpf: true,
-      avatar: true,
-      xp: true,
-      level: true,
-      achievements: true,
+    include: {
+      achievements: {
+        include: {
+          achievement: {
+            select: { name: true, criterion: true },
+          },
+        },
+      },
     },
   });
 }

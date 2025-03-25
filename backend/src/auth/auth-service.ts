@@ -9,7 +9,7 @@ import jwt from "jsonwebtoken";
 const jwtSecret = process.env.JWT_SECRET!;
 
 export async function singIn(data: userData) {
-  if (!data.email || !data.cpf || !data.password || !data.name) {
+  if (!data.email || !data.password) {
     throw new Error("E1");
   }
   const user = await getUserRepository(data);
@@ -19,12 +19,23 @@ export async function singIn(data: userData) {
   const validPassword = await bcrypt.compare(data.password, user.password);
   if (!validPassword) throw new Error("E5");
 
-  const token = jwt.sign(data, jwtSecret, { expiresIn: "30min" });
+  const token = jwt.sign({ id: user.id }, jwtSecret, { expiresIn: "30min" });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { password, ...userWithoutPassword } = user;
-
-  return { ...userWithoutPassword, token };
+  return {
+    token: token,
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    cpf: user.cpf,
+    avatar: user.avatar,
+    xp: user.xp,
+    level: user.level,
+    achievements:
+      user.achievements?.map((item) => ({
+        name: item.achievement.name,
+        criterion: item.achievement.criterion,
+      })) || [],
+  };
 }
 
 export async function registerService(data: {
