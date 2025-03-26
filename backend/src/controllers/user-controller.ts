@@ -8,13 +8,12 @@ import {
   updateUser,
 } from "../services/user-service";
 import validateRequestBody from "../middlewares/request-validator";
-import userValidation from "../../validations/user-validation";
+import updateValidation from "../../validations/update-validation";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const userController = (server: Express) => {
   const router = Router();
   router.use(authGuard);
-  router.use(validateRequestBody(userValidation));
 
   router.get("/", async (request, response) => {
     try {
@@ -102,25 +101,29 @@ const userController = (server: Express) => {
     }
   });
 
-  router.put("/update", async (request, response) => {
-    try {
-      const user = await getUserAuth(request.userId);
-      if (user) {
-        const updatedUser = await updateUser(request.body, request.userId);
-        response.status(200).json(updatedUser);
-      }
-    } catch (error: any) {
-      switch (error.message) {
-        case "E6":
-          response.status(403).json({
-            error: "Esta conta foi desativada e não pode ser utilizada.",
-          });
-          break;
-        default:
-          response.status(500).json({ error: "Erro inesperado." });
+  router.put(
+    "/update",
+    validateRequestBody(updateValidation),
+    async (request, response) => {
+      try {
+        const user = await getUserAuth(request.userId);
+        if (user) {
+          const updatedUser = await updateUser(request.body, request.userId);
+          response.status(200).json(updatedUser);
+        }
+      } catch (error: any) {
+        switch (error.message) {
+          case "E6":
+            response.status(403).json({
+              error: "Esta conta foi desativada e não pode ser utilizada.",
+            });
+            break;
+          default:
+            response.status(500).json({ error: "Erro inesperado." });
+        }
       }
     }
-  });
+  );
 
   router.delete("/deactivate", async (request, response) => {
     try {
