@@ -13,8 +13,17 @@ export async function getUserAuthRepository(userId: string) {
       avatar: true,
       xp: true,
       level: true,
-      achievements: true,
       deletedAt: true,
+      achievements: {
+        include: {
+          achievement: {
+            select: {
+              name: true,
+              criterion: true,
+            },
+          },
+        },
+      },
     },
   });
 }

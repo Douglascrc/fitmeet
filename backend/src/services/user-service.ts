@@ -12,10 +12,26 @@ import userData from "../types/user-creation";
 
 export async function getUserAuth(userId: string) {
   const user = await getUserAuthRepository(userId);
-  if (user?.deletedAt != null) {
+  if (!user) {
+    throw new Error("E4");
+  }
+  if (user.deletedAt != null) {
     throw new Error("E6");
   }
-  return user;
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    cpf: user.cpf,
+    avatar: user.avatar,
+    xp: user.xp,
+    level: user.level,
+    achievements:
+      user.achievements?.map((item) => ({
+        name: item.achievement.name,
+        criterion: item.achievement.criterion,
+      })) || [],
+  };
 }
 
 export async function deactivate(userId: string) {
@@ -45,9 +61,12 @@ export async function definePreferences(userId: string, typeIds: string[]) {
 }
 
 export async function getPreferences(userId: string) {
-  const user = await getUserAuth(userId);
+  const user = await getUserAuthRepository(userId);
   const preferences = await getPreferencesRepository(userId);
-  if (user?.deletedAt != null) {
+  if (!user) {
+    throw new Error("E4");
+  }
+  if (user.deletedAt != null) {
     throw new Error("E6");
   }
   const formatted = preferences.map((pref) => ({

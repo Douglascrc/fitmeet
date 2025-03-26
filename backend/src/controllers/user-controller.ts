@@ -38,6 +38,11 @@ const userController = (server: Express) => {
       response.status(200).json(preferences);
     } catch (error: any) {
       switch (error.message) {
+        case "E4":
+          response.status(400).json({
+            error: "Usuário não encontrado.",
+          });
+          break;
         case "E6":
           response.status(403).json({
             error: "Esta conta foi desativada e não pode ser utilizada.",
