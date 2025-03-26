@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import {
   createUserRepository,
   getUserRepository,
-} from "../repository/user-repository";
+} from "../repositories/user-repository";
 import userData from "../types/user-creation";
 import jwt from "jsonwebtoken";
 
