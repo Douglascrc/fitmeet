@@ -1,11 +1,20 @@
 import { Express, Router } from "express";
 import authGuard from "../middlewares/auth-guard";
-import { deactivate, getUserAuth } from "../services/user-service";
+import {
+  deactivate,
+  definePreferences,
+  getPreferences,
+  getUserAuth,
+  updateUser,
+} from "../services/user-service";
+import validateRequestBody from "../middlewares/request-validator";
+import userValidation from "../../validations/user-validation";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const userController = (server: Express) => {
   const router = Router();
   router.use(authGuard);
+  router.use(validateRequestBody(userValidation));
 
   router.get("/", async (request, response) => {
     try {
@@ -25,19 +34,92 @@ const userController = (server: Express) => {
   });
 
   router.get("/preferences", async (request, response) => {
-    response.json();
+    try {
+      const preferences = await getPreferences(request.userId);
+      response.status(200).json(preferences);
+    } catch (error: any) {
+      switch (error.message) {
+        case "E6":
+          response.status(403).json({
+            error: "Esta conta foi desativada e não pode ser utilizada.",
+          });
+          break;
+        default:
+          response.status(500).json({ error: "Erro inesperado." });
+      }
+    }
   });
 
-  router.post("/preferencs/define", async (request, response) => {
-    response.json(201);
+  router.post("/preferences/define", async (request, response) => {
+    try {
+      const validActivityTypes = await definePreferences(
+        request.userId,
+        request.body
+      );
+      if (validActivityTypes) {
+        response.status(200).json({
+          message: "Preferências atualizadas com sucesso!",
+          preferences: validActivityTypes,
+        });
+        return;
+      }
+    } catch (error: any) {
+      switch (error.message) {
+        case "Id":
+          response
+            .status(400)
+            .json({ error: "Um ou mais IDs informados são inválidos." });
+          break;
+        default:
+          response.status(500).json({ error: "Erro inesperado." });
+          return;
+      }
+    }
   });
 
   router.put("/avatar", async (request, response) => {
-    response.json();
+    try {
+      const user = await getUserAuth(request.userId);
+      if (user) {
+        await updateUser(request.body, request.userId);
+        response.status(200).json(user);
+      }
+    } catch (error: any) {
+      switch (error.message) {
+        case "E4":
+          response.status(400).json({
+            error: "A imagem deve ser um arquivo PNG ou JPG.",
+          });
+          break;
+        case "E6":
+          response.status(403).json({
+            error: "Esta conta foi desativada e não pode ser utilizada.",
+          });
+          break;
+        default:
+          response.status(500).json({ error: "Erro inesperado." });
+      }
+    }
   });
 
   router.put("/update", async (request, response) => {
-    response.json();
+    try {
+      const user = await getUserAuth(request.userId);
+      if (user) {
+        const updatedUser = await updateUser(request.body, request.userId);
+        response.status(200).json(updatedUser);
+      }
+    } catch (error: any) {
+      switch (error.message) {
+        case "E6":
+          response.status(403).json({
+            error: "Esta conta foi desativada e não pode ser utilizada.",
+          });
+          break;
+        default:
+          response.status(500).json({ error: "Erro inesperado." });
+      }
+    }
   });
 
   router.delete("/deactivate", async (request, response) => {
