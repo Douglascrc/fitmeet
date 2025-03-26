@@ -6,7 +6,13 @@ import authController from "./auth/auth-controller";
 
 export const server = express();
 
-server.use(express.json());
+server.use((req, res, next) => {
+  if (req.method === "GET") {
+    return next();
+  }
+  return express.json()(req, res, next);
+});
+
 server.use(cors());
 
 userController(server);
