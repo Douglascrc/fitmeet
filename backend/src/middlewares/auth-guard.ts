@@ -24,7 +24,7 @@ export default function authGuard(
 
     const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, jwtSecret) as { id: string };
-    console.log(decoded);
+
     request.userId = decoded.id;
     next();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars

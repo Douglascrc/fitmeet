@@ -19,7 +19,7 @@ export async function singIn(data: userData) {
   const validPassword = await bcrypt.compare(data.password, user.password);
   if (!validPassword) throw new Error("E5");
 
-  const token = jwt.sign({ id: user.id }, jwtSecret, { expiresIn: "30min" });
+  const token = jwt.sign({ id: user.id }, jwtSecret, { expiresIn: "1d" });
 
   return {
     token: token,
