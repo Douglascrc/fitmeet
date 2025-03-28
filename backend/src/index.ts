@@ -3,6 +3,8 @@ import express from "express";
 import cors from "cors";
 import userController from "./controllers/user-controller";
 import authController from "./auth/auth-controller";
+import activityController from "./controllers/activity-controller";
+import { createBucket } from "./services/s3-service";
 
 export const server = express();
 
@@ -14,9 +16,10 @@ server.use((req, res, next) => {
 });
 
 server.use(cors());
-
+createBucket();
 userController(server);
 authController(server);
+activityController(server);
 
 const port = process.env.PORT;
 
