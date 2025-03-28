@@ -9,11 +9,7 @@ declare module "express-serve-static-core" {
   }
 }
 
-export default function authGuard(
-  request: Request,
-  response: Response,
-  next: NextFunction
-) {
+export default function authGuard(request: Request, response: Response, next: NextFunction) {
   const authHeader = request.headers.authorization;
 
   try {

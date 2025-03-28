@@ -10,6 +10,13 @@ import {
 } from "../repositories/user-repository";
 import userData from "../types/user-creation";
 
+export async function getUserById(userId: string) {
+  const user = await getUserAuthRepository(userId);
+  if (!user) {
+    throw new Error("E4");
+  }
+  return user;
+}
 export async function getUserAuth(userId: string) {
   const user = await getUserAuthRepository(userId);
   if (!user) {
