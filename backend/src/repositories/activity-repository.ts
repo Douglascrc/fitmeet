@@ -1,4 +1,4 @@
-import prisma from "../prisma/prisma-client";
+import prisma from "../prisma-orm/prisma-client";
 import { Activity } from "@prisma/client";
 
 export async function createActivityRepository(data: {

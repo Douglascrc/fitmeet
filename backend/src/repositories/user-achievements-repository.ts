@@ -1,4 +1,4 @@
-import prisma from "../prisma/prisma-client";
+import prisma from "../prisma-orm/prisma-client";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function create(data: any) {
@@ -18,10 +18,7 @@ export async function findAchievementsByUserId(userId: string) {
   });
 }
 
-export async function findByAchievementIdAndUserId(
-  achievementId: string,
-  userId: string
-) {
+export async function findByAchievementIdAndUserId(achievementId: string, userId: string) {
   return await prisma.userAchievement.findUnique({
     where: {
       userId_achievementId: {

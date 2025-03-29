@@ -1,4 +1,4 @@
-import prisma from "../prisma/prisma-client";
+import prisma from "../prisma-orm/prisma-client";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createMany(data: any[]) {

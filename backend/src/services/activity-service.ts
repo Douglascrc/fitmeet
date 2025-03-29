@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import * as activityRepository from "../repositories/activity-repository";
-import prisma from "../prisma/prisma-client";
+import prisma from "../prisma-orm/prisma-client";
 import activityData from "../types/activity-creation";
 import { uploadImage } from "./s3-service";
 

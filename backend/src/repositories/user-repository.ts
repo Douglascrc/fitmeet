@@ -1,4 +1,4 @@
-import prisma from "../prisma/prisma-client";
+import prisma from "../prisma-orm/prisma-client";
 import { ActivityType, Prisma } from "@prisma/client";
 import userData from "../types/user-creation";
 
