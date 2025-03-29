@@ -1,5 +1,4 @@
 import { randomBytes } from "crypto";
-
 import * as activityRepository from "../repositories/activity-repository";
 import prisma from "../prisma/prisma-client";
 import activityData from "../types/activity-creation";
@@ -199,9 +198,20 @@ export async function checkInActivity(
     await activityRepository.updateActivityParticipantRepository(activityId, userId);
     return { message: "Participação confirmada." };
   } else {
-    // Caso não exista registro de participação, pode optar por criar ou retornar erro.
     throw new Error("E10"); // Código inválido ou participação não cadastrada.
   }
+}
+
+export async function getActivityTypes() {
+  const activityTypes = await activityRepository.getAllActivityTypes();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return {
+    id: activityTypes[0],
+    name: activityTypes[1],
+    description: activityTypes[2],
+    image: activityTypes[3],
+  };
 }
 
 export async function listActivities(query: {

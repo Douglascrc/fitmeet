@@ -16,6 +16,9 @@ export async function createActivityRepository(data: {
   });
 }
 
+export async function getAllActivityTypes() {
+  return await prisma.activityType.findMany({});
+}
 export async function findActivityTypeById(id: string) {
   return await prisma.activityType.findUnique({
     where: { id },
@@ -46,10 +49,7 @@ export async function getActivityByIdRepository(id: string) {
   });
 }
 
-export async function getActivityParticipantRepository(
-  activityId: string,
-  userId: string
-) {
+export async function getActivityParticipantRepository(activityId: string, userId: string) {
   return await prisma.activityParticipant.findUnique({
     where: {
       activityId_userId: { activityId, userId },
@@ -67,10 +67,7 @@ export async function concludeActivityRepository(activityId: string) {
   });
 }
 
-export async function deleteActivityRepository(
-  activityId: string,
-  userId: string
-) {
+export async function deleteActivityRepository(activityId: string, userId: string) {
   return await prisma.activity.delete({
     where: {
       id: activityId,
@@ -79,10 +76,7 @@ export async function deleteActivityRepository(
   });
 }
 
-export async function updateActivityParticipantRepository(
-  activityId: string,
-  userId: string
-) {
+export async function updateActivityParticipantRepository(activityId: string, userId: string) {
   return await prisma.activityParticipant.update({
     where: {
       activityId_userId: { activityId, userId },
