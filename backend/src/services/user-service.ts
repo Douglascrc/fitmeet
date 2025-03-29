@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import {
   createPreferenceRepository,
   deactivateRepository,
@@ -5,10 +6,11 @@ import {
   getActivityTypesByIds,
   getPreferencesRepository,
   getUserAuthRepository,
-  updateAvatarRepository,
+  updateAvatarById,
   updateUserRepository,
 } from "../repositories/user-repository";
 import userData from "../types/user-creation";
+import { uploadImage } from "./s3-service";
 
 export async function getUserById(userId: string) {
   const user = await getUserAuthRepository(userId);
@@ -85,14 +87,35 @@ export async function getPreferences(userId: string) {
   return formatted;
 }
 
-export async function updateAvatar(avatar: string, userId: string) {
-  return await updateAvatarRepository(avatar, userId);
+export async function updateAvatar(avatar: Express.Multer.File, userId: string) {
+  const user = await getUserAuthRepository(userId);
+  if (!user) {
+    throw new Error("E4");
+  }
+  if (!["image/png", "image/jpeg"].includes(avatar.mimetype)) {
+    throw new Error("E2");
+  }
+
+  const imageUrl = await uploadImage(avatar);
+
+  const updatedUser = await updateAvatarById(imageUrl, userId);
+  console.log(imageUrl);
+
+  return {
+    avatar: updatedUser.avatar,
+  };
 }
 
 export async function updateUser(data: userData, userId: string) {
-  const { cpf } = data;
-  if (cpf) {
-    console.error("O usuário não pode editar seu CPF");
+  const user = await getUserAuthRepository(userId);
+  if (!user) {
+    throw new Error("E4");
+  }
+
+  const isSamePassword = await bcrypt.compare(data.password, user.password);
+  if (!isSamePassword) {
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    data.password = hashedPassword;
   }
 
   return await updateUserRepository(data, userId);

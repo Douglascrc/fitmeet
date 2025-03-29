@@ -9,6 +9,7 @@ export async function getUserAuthRepository(userId: string) {
       id: true,
       name: true,
       email: true,
+      password: true,
       cpf: true,
       avatar: true,
       xp: true,
@@ -67,7 +68,7 @@ export async function getPreferencesRepository(userId: string) {
   return preferences;
 }
 
-export async function updateAvatarRepository(avatar: string, id: string) {
+export async function updateAvatarById(avatar: string, id: string) {
   return await prisma.user.update({
     where: { id },
     data: { avatar },
@@ -79,6 +80,15 @@ export async function updateUserRepository(data: userData, id: string) {
     data,
     where: {
       id,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      cpf: true,
+      avatar: true,
+      xp: true,
+      level: true,
     },
   });
 }
@@ -110,10 +120,9 @@ export async function deactivateRepository(id: string) {
 }
 
 export async function getUserRepository({ email, cpf }: userData) {
-  return await prisma.user.findUnique({
+  return await prisma.user.findFirst({
     where: {
-      email,
-      cpf,
+      OR: [{ email: email }, { cpf: cpf }],
     },
     include: {
       achievements: {
