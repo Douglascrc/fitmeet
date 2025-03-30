@@ -1,0 +1,274 @@
+openapi: 3.0.0
+info:
+  title: Desafio técnico - Engenheiro back-end
+  version: "1.0.0"
+  description: Documentação da API do desafio técnico.
+servers:
+  - url: http://localhost:3000
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        email: { type: string, format: email }
+        cpf: { type: string }
+        avatar: { type: string }
+        xp: { type: integer }
+        level:
+          type: integer
+          default: 1
+        achievements:
+          type: array
+          items: { $ref: "#/components/schemas/Achievement" }
+    Achievement:
+      type: object
+      properties:
+        name: { type: string }
+        criterion: { type: string }
+    Activity:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        description: { type: string }
+        type: { type: string }
+        image: { type: string }
+        confirmationCode: { type: string }
+        scheduledDate: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time }
+        private: { type: boolean }
+    ErrorResponse:
+      type: object
+      properties:
+        error: { type: string }
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "Autenticação necessária"
+    Forbidden:
+      description: Acesso negado
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+paths:
+  # ===== AUTENTICAÇÃO =====
+  /auth/register:
+    post:
+      tags: [Autenticação]
+      summary: Cadastrar novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                cpf: { type: string }
+                password: { type: string }
+              required: [name, email, cpf, password]
+      responses:
+        "201":
+          description: Usuário criado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Usuário criado com sucesso"
+        "409":
+          description: Conflito
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /auth/sign-in:
+    post:
+      tags: [Autenticação]
+      summary: Login do usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+                password: { type: string }
+              required: [email, password]
+      responses:
+        "200":
+          description: Login bem sucedido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  user: { $ref: "#/components/schemas/User" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # ===== USUÁRIOS =====
+  /user:
+    get:
+      tags: [Usuários]
+      summary: Buscar dados do usuário
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Dados do usuário
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /user/preferences:
+    get:
+      tags: [Usuários]
+      summary: Obter interesses do usuário
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Lista de interesses
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { type: string }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /user/preferences/define:
+    post:
+      tags: [Usuários]
+      summary: Definir interesses do usuário
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items: { type: string }
+      responses:
+        "200":
+          description: Interesses atualizados
+        "400":
+          description: IDs inválidos
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /user/avatar:
+    put:
+      tags: [Usuários]
+      summary: Atualizar foto de perfil
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar: { type: string, format: binary }
+      responses:
+        "200":
+          description: Avatar atualizado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+        "400":
+          description: Formato de imagem inválido
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  # ===== ATIVIDADES =====
+  /activities/types:
+    get:
+      tags: [Atividades]
+      summary: Listar tipos de atividades
+      responses:
+        "200":
+          description: Lista de tipos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string }
+                    name: { type: string }
+
+  /activities:
+    get:
+      tags: [Atividades]
+      summary: Listar atividades com paginação
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: type
+          in: query
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer }
+        - name: pageSize
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Lista de atividades
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  activities:
+                    type: array
+                    items: { $ref: "#/components/schemas/Activity" }
+
+  /activities/new:
+    post:
+      tags: [Atividades]
+      summary: Criar nova atividade
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Activity" }
+      responses:
+        "201":
+          description: Atividade criada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Activity" }
+
+  # Continuação dos demais endpoints seguindo a mesma estrutura...
+  # Adicione aqui os demais endpoints na ordem exata do documento
