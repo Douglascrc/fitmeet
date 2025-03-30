@@ -1,5 +1,4 @@
 import prisma from "../prisma-orm/prisma-client";
-import { ActivityType, Prisma } from "@prisma/client";
 import userData from "../types/user-creation";
 
 export async function getUserAuthRepository(userId: string) {
@@ -94,7 +93,8 @@ export async function updateUserRepository(data: userData, id: string) {
 }
 
 export async function deletaActivitiesRepository(
-  validActivityTypes: ActivityType[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  validActivityTypes: any[],
   userId: string
 ) {
   return await prisma.preference.deleteMany({
@@ -105,9 +105,8 @@ export async function deletaActivitiesRepository(
   });
 }
 
-export async function createPreferenceRepository(
-  newPreferences: Prisma.PreferenceCreateManyInput[]
-) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function createPreferenceRepository(newPreferences: any[]) {
   return await prisma.preference.createMany({
     data: newPreferences,
     skipDuplicates: true,
