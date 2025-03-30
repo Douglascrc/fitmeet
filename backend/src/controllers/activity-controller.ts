@@ -12,7 +12,8 @@ const activityController = (server: Express) => {
 
   router.get("/", async (request, response) => {
     try {
-      const result = await activityService.listActivities(request.query);
+      const query = { ...request.query, userId: request.userId };
+      const result = await activityService.listActivities(query);
       response.status(200).json(result);
     } catch (error: any) {
       response.status(500).json({ error: "Erro inesperado" });
@@ -44,7 +45,8 @@ const activityController = (server: Express) => {
 
   router.get("/all", async (request, response) => {
     try {
-      const result = await activityService.listActivities(request.query);
+      const query = { ...request.query, userId: request.userId };
+      const result = await activityService.listActivities(query);
       response.status(200).json(result);
     } catch (error: any) {
       response.status(500).json({ error: "Erro inesperado" });
@@ -53,7 +55,8 @@ const activityController = (server: Express) => {
 
   router.get("/user/creator", async (request, response) => {
     try {
-      const result = await activityService.listActivities(request.query);
+      const query = { ...request.query, userId: request.userId };
+      const result = await activityService.listActivities(query);
       response.status(200).json(result);
     } catch (error: any) {
       response.status(500).json({ error: "Erro inesperado" });
@@ -62,7 +65,8 @@ const activityController = (server: Express) => {
 
   router.get("/user/creator/all", async (request, response) => {
     try {
-      const result = await activityService.listActivities(request.query);
+      const query = { ...request.query, userId: request.userId };
+      const result = await activityService.listActivities(query);
       response.status(200).json(result);
     } catch (error: any) {
       response.status(500).json({ error: "Erro inesperado" });
@@ -71,7 +75,8 @@ const activityController = (server: Express) => {
 
   router.get("/user/participant", async (request, response) => {
     try {
-      const result = await activityService.listActivities(request.query);
+      const query = { ...request.query, userId: request.userId };
+      const result = await activityService.listActivities(query);
       response.status(200).json(result);
     } catch (error: any) {
       response.status(500).json({ error: "Erro inesperado" });
@@ -80,7 +85,8 @@ const activityController = (server: Express) => {
 
   router.get("/user/participant/all", async (request, response) => {
     try {
-      const result = await activityService.listActivities(request.query);
+      const query = { ...request.query, userId: request.userId };
+      const result = await activityService.listActivities(query);
       response.status(200).json(result);
     } catch (error: any) {
       response.status(500).json({ error: "Erro inesperado" });

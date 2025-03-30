@@ -158,14 +158,14 @@ export async function listActivities(params: {
 }
 
 export async function listActivitiesRepository(params: {
-  typeId?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  whereClause: any;
   orderBy: "createdAt";
   order: "asc" | "desc";
   skip: number;
   take: number;
 }) {
-  const { typeId, orderBy, order, skip, take } = params;
-  const whereClause = typeId ? { typeId } : {};
+  const { whereClause, orderBy, order, skip, take } = params;
   const [activities, totalActivities] = await Promise.all([
     prisma.activity.findMany({
       where: whereClause,
@@ -180,6 +180,15 @@ export async function listActivitiesRepository(params: {
     prisma.activity.count({ where: whereClause }),
   ]);
   return { activities, totalActivities };
+}
+
+export async function listParticipantsByActivityRepository(activityId: string) {
+  return await prisma.activityParticipant.findMany({
+    where: { activityId },
+    include: {
+      user: { select: { name: true, avatar: true } },
+    },
+  });
 }
 
 export async function subscribeActivityRepository(userId: string, activityId: string) {

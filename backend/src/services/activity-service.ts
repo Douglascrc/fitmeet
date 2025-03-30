@@ -3,7 +3,7 @@ import * as activityRepository from "../repositories/activity-repository";
 import prisma from "../prisma-orm/prisma-client";
 import activityData from "../types/activity-creation";
 import { uploadImage } from "./s3-service";
-import { addExperience } from "./user-service";
+import { addExperience, getPreferences } from "./user-service";
 import { grantAchievement } from "./user-achievements-service";
 
 const XP_FOR_CHECKIN = 10;
@@ -204,25 +204,23 @@ export async function subscribeActivity(userId: string, activityId: string) {
 }
 
 export async function getParticipantsByActivityId(userId: string, activityId: string) {
-  const activityParticipant = await activityRepository.getActivityParticipantRepository(
-    userId,
-    activityId
-  );
-  if (!activityParticipant) {
-    throw new Error("E20");
+  const activity = await getActivityById(activityId);
+  const allParticipants = await activityRepository.listParticipantsByActivityRepository(activityId);
+
+  let filteredParticipants = allParticipants;
+
+  if (activity?.private && activity.creatorId !== userId) {
+    filteredParticipants = allParticipants.filter((p) => p.approved);
   }
 
-  if (activityParticipant.userId !== userId) {
-    throw new Error("E21"); // Este não participa desta atividade.
-  }
-  return {
-    id: activityParticipant.id,
-    userId: activityParticipant.userId,
-    name: activityParticipant.userId,
-    subscripitionStatus: activityParticipant.approved,
-    avatar: activityParticipant.user.avatar,
-    confirmatedAt: activityParticipant.confirmedAt,
-  };
+  return filteredParticipants.map((p) => ({
+    id: p.id,
+    userId: p.userId,
+    name: p.user.name,
+    subscriptionStatus: p.approved,
+    avatar: p.user.avatar,
+    confirmedAt: p.confirmedAt,
+  }));
 }
 
 export async function createParticipant(userId: string, activityId: string) {
@@ -296,42 +294,86 @@ export async function getActivityTypes() {
 }
 
 export async function listActivities(query: {
+  userId: string;
   type?: string;
   orderBy?: string;
-  order?: string;
+  order?: "asc" | "desc";
   page?: string;
   pageSize?: string;
+  showDeleted?: boolean;
+  mode?: "creator" | "participant";
 }) {
-  const orderBy = (query.orderBy as "createdAt") || "createdAt";
-  const order = (query.order as "asc" | "desc") || "asc";
+  const orderBy = query.orderBy || "createdAt";
+  const order = query.order || "desc";
   const page = query.page ? parseInt(query.page, 10) : 0;
   const pageSize = query.pageSize ? parseInt(query.pageSize, 10) : 10;
   const skip = page * pageSize;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const whereClause: any = {
+    completedAt: null,
+  };
+
+  if (!query.showDeleted) {
+    whereClause.deletedAt = null;
+  }
+
+  if (query.type) {
+    whereClause.typeId = query.type;
+  } else {
+    const preferences = await getPreferences(query.userId);
+    if (preferences && preferences.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const preferredTypeIds = preferences.map((pref: any) => pref.typeId);
+      whereClause.typeId = { in: preferredTypeIds };
+    }
+  }
+
+  if (query.mode === "participant") {
+    whereClause.participants = {
+      some: {
+        userId: query.userId,
+        approved: true,
+      },
+    };
+  }
+
+  if (query.mode === "creator") {
+    whereClause.creatorId = query.userId;
+  }
+
   const { activities, totalActivities } = await activityRepository.listActivitiesRepository({
-    typeId: query.type,
-    orderBy,
+    whereClause,
+    orderBy: orderBy as "createdAt",
     order,
     skip,
     take: pageSize,
+  });
+
+  const modifiedActivities = activities.map((act) => {
+    const baseActivity = {
+      id: act.id,
+      title: act.title,
+      description: act.description,
+      type: act.type.name,
+      image: act.image,
+      scheduledDate: act.scheduledDate,
+      createdAt: act.createdAt,
+      completedAt: act.completedAt,
+      private: act.private,
+      creator: act.creatorId,
+    };
+    if (act.creatorId === query.userId) {
+      return { ...baseActivity, confirmationCode: act.confirmationCode };
+    }
+    return baseActivity;
   });
 
   return {
     page,
     pageSize,
     totalActivities,
-    activities: activities.map((act) => ({
-      id: act.id,
-      title: act.title,
-      description: act.description,
-      type: act.type.name,
-      image: act.image,
-      confirmationCode: act.confirmationCode,
-      scheduledDate: act.scheduledDate,
-      createdAt: act.createdAt,
-      completedAt: act.completedAt,
-      private: act.private,
-      creator: act.creatorId,
-    })),
+    activities: modifiedActivities,
   };
 }
 
