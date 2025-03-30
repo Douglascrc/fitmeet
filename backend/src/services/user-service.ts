@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import bcrypt from "bcryptjs";
 import {
   createPreferenceRepository,
@@ -37,7 +38,7 @@ export async function getUserAuth(userId: string) {
     xp: user.xp,
     level: user.level,
     achievements:
-      user.achievements?.map((item) => ({
+      user.achievements?.map((item: any) => ({
         name: item.achievement.name,
         criterion: item.achievement.criterion,
       })) || [],
@@ -60,7 +61,7 @@ export async function definePreferences(userId: string, typeIds: string[]) {
   }
 
   await deletaActivitiesRepository(validActivityTypes, userId);
-  const newPreferences = validActivityTypes.map((v) => ({
+  const newPreferences = validActivityTypes.map((v: any) => ({
     userId,
     typeId: v.id,
   }));
@@ -79,7 +80,7 @@ export async function getPreferences(userId: string) {
   if (user.deletedAt != null) {
     throw new Error("E6");
   }
-  const formatted = preferences.map((pref) => ({
+  const formatted = preferences.map((pref: any) => ({
     typeId: pref.type.id,
     typeName: pref.type.name,
     typeDescription: pref.type.description,
