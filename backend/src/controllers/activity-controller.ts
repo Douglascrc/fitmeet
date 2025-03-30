@@ -4,7 +4,7 @@ import upload from "../multer/multer";
 import * as activityService from "../services/activity-service";
 import userStatus from "../middlewares/userStatus";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */ /* eslint-disable @typescript-eslint/no-unused-vars */
 const activityController = (server: Express) => {
   const router = Router();
   router.use(authGuard);
@@ -15,15 +15,7 @@ const activityController = (server: Express) => {
       const result = await activityService.listActivities(request.query);
       response.status(200).json(result);
     } catch (error: any) {
-      switch (error.message) {
-        case "E6":
-          response.status(403).json({
-            error: "Esta conta foi desativada e não pode ser utilizada.",
-          });
-          break;
-        default:
-          response.status(500).json({ error: "Erro inesperado" });
-      }
+      response.status(500).json({ error: "Erro inesperado" });
     }
   });
 
@@ -32,31 +24,21 @@ const activityController = (server: Express) => {
       const result = await activityService.getActivityTypes();
       response.status(200).json(result);
     } catch (error: any) {
-      switch (error.message) {
-        case "E6":
-          response.status(403).json({
-            error: "Esta conta foi desativada e não pode ser utilizada.", // É obrigatorio o campo imagem no banco?
-          });
-          break;
-        default:
-          response.status(500).json({ error: "Erro inesperado" });
-      }
+      response.status(500).json({ error: "Erro inesperado" });
     }
   });
 
   router.get("/:id/participants", async (request, response) => {
     try {
       const activityId = request.params.id;
+      const activity = await activityService.getActivityById(activityId);
+      if (!activity) {
+        response.status(404).json({ error: "Atividade não encontrada." });
+      }
       const result = await activityService.getParticipantsByActivityId(request.userId, activityId);
       response.status(201).json(result);
     } catch (error: any) {
-      switch (error.message) {
-        case "E20":
-          response.status(404).json({ error: "Atividade não encontrada." });
-          break;
-        default:
-          response.status(500).json({ error: "Erro inesperado." });
-      }
+      response.status(500).json({ error: "Erro inesperado." });
     }
   });
 
@@ -65,10 +47,7 @@ const activityController = (server: Express) => {
       const result = await activityService.listActivities(request.query);
       response.status(200).json(result);
     } catch (error: any) {
-      switch (error.message) {
-        default:
-          response.status(500).json({ error: "Erro inesperado" });
-      }
+      response.status(500).json({ error: "Erro inesperado" });
     }
   });
 
@@ -77,10 +56,7 @@ const activityController = (server: Express) => {
       const result = await activityService.listActivities(request.query);
       response.status(200).json(result);
     } catch (error: any) {
-      switch (error.message) {
-        default:
-          response.status(500).json({ error: "Erro inesperado" });
-      }
+      response.status(500).json({ error: "Erro inesperado" });
     }
   });
 
@@ -89,10 +65,7 @@ const activityController = (server: Express) => {
       const result = await activityService.listActivities(request.query);
       response.status(200).json(result);
     } catch (error: any) {
-      switch (error.message) {
-        default:
-          response.status(500).json({ error: "Erro inesperado" });
-      }
+      response.status(500).json({ error: "Erro inesperado" });
     }
   });
 
@@ -101,10 +74,7 @@ const activityController = (server: Express) => {
       const result = await activityService.listActivities(request.query);
       response.status(200).json(result);
     } catch (error: any) {
-      switch (error.message) {
-        default:
-          response.status(500).json({ error: "Erro inesperado" });
-      }
+      response.status(500).json({ error: "Erro inesperado" });
     }
   });
 
@@ -113,25 +83,23 @@ const activityController = (server: Express) => {
       const result = await activityService.listActivities(request.query);
       response.status(200).json(result);
     } catch (error: any) {
-      switch (error.message) {
-        default:
-          response.status(500).json({ error: "Erro inesperado" });
-      }
+      response.status(500).json({ error: "Erro inesperado" });
     }
   });
 
   router.post("/:id/subscribe", async (request, response) => {
     try {
       const activityId = request.params.id;
+      const activity = await activityService.getActivityById(activityId);
+      if (!activity) {
+        response.status(404).json({ error: "Atividade não encontrada." });
+      }
       const result = await activityService.subscribeActivity(request.userId, activityId);
       response.status(201).json(result);
     } catch (error: any) {
       switch (error.message) {
-        case "E14":
-          response.status(400).json({ error: "Atividade já foi inscrita." });
-          break;
-        case "E13":
-          response.status(404).json({ error: "Atividade não encontrada." });
+        case "E7":
+          response.status(409).json({ error: "Você já se registrou nesta atividade." });
           break;
         default:
           response.status(500).json({ error: "Erro inesperado." });
@@ -156,11 +124,6 @@ const activityController = (server: Express) => {
         case "E2":
           response.status(400).json({ error: "A imagem deve ser um arquivo PNG ou JPG" });
           break;
-        case "E6":
-          response.status(403).json({
-            error: "Esta conta foi desativada e não pode ser utilizada.",
-          });
-          break;
         default:
           response.status(500).json({ error: "Erro inesperado." });
       }
@@ -170,10 +133,14 @@ const activityController = (server: Express) => {
   router.put("/:id/update", upload.single("image"), async (request, response) => {
     try {
       const activityId = request.params.id;
+      const activity = await activityService.getActivityById(activityId);
+      if (!activity) {
+        response.status(404).json({ error: "Atividade não encontrada." });
+      }
       const result = await activityService.updateActivity(
         request.userId,
-        request.body,
         activityId,
+        request.body,
         request.file
       );
       response.status(200).json(result);
@@ -182,11 +149,11 @@ const activityController = (server: Express) => {
         case "E2":
           response.status(400).json({ error: "A imagem deve ser um arquivo PNG ou JPG" });
           break;
-        case "E7":
-          response.status(403).json({ error: "Acesso negado." });
+        case "E14":
+          response.status(403).json({ error: "Apenas o criador da atividade pode editá-la." });
           break;
-        case "E8":
-          response.status(404).json({ error: "Atividade não encontrada." });
+        case "Informe latitude e longitude juntos.":
+          response.status(400).json({ error: "Informe latitude e longitude juntos." });
           break;
         default:
           response.status(500).json({ error: "Erro inesperado" });
@@ -197,15 +164,16 @@ const activityController = (server: Express) => {
   router.put(":id/conclude", async (request, response) => {
     try {
       const activityId = request.params.id;
+      const activity = await activityService.getActivityById(activityId);
+      if (!activity) {
+        response.status(404).json({ error: "Atividade não encontrada." });
+      }
       await activityService.concludeActivity(request.userId, activityId);
       response.status(200).json({ message: "Atividade concluída com sucesso." });
     } catch (error: any) {
       switch (error.message) {
         case "E17":
           response.status(403).json({ error: "Apenas o criador da atividade pode concluí-la." });
-          break;
-        case "E8":
-          response.status(404).json({ error: "Atividade não encontrada." });
           break;
         default:
           response.status(500).json({ error: "Erro inesperado" });
@@ -216,10 +184,13 @@ const activityController = (server: Express) => {
   router.put("/:id/approve", async (request, response) => {
     try {
       const activityId = request.params.id;
-      await activityService.approveParticipant(request.body, activityId);
+      await activityService.approveParticipant(request.body, activityId, request.userId);
       response.status(200).json({ message: "Solicitação de participação aprovada com sucesso." });
     } catch (error: any) {
       switch (error.message) {
+        case "E16":
+          response.status(403).json({ error: "Apenas o criador da atividade pode aprovar." });
+          break;
         default:
           response.status(500).json({ error: "Erro inesperado" });
       }
@@ -229,6 +200,11 @@ const activityController = (server: Express) => {
   router.put("/:id/check-in", async (request, response) => {
     try {
       const activityId = request.params.id;
+      const activity = await activityService.getActivityById(activityId);
+
+      if (!activity) {
+        response.status(404).json({ error: "Atividade não encontrada." });
+      }
       const { confirmationCode } = request.body;
       const result = await activityService.checkInActivity(
         request.userId,
@@ -238,14 +214,10 @@ const activityController = (server: Express) => {
       response.status(200).json(result);
     } catch (error: any) {
       switch (error.message) {
-        case "E10":
-          response.status(400).json({ error: "Código inválido." });
-          break;
-        case "E9":
-          response.status(403).json({ error: "Participação não aprovada." });
-          break;
         case "E11":
-          response.status(409).json({ error: "Check-in já realizado." });
+          response
+            .status(409)
+            .json({ error: "Você já confirmou sua participação nesta atividade." });
           break;
         default:
           response.status(500).json({ error: "Erro inesperado" });
@@ -272,6 +244,10 @@ const activityController = (server: Express) => {
   router.delete("/:id/delete", async (request, response) => {
     try {
       const activityId = request.params.id;
+      const activity = await activityService.getActivityById(activityId);
+      if (!activity) {
+        response.status(404).json({ error: "Atividade não encontrada." });
+      }
       await activityService.deleteActivity(request.userId, activityId);
       response.status(200).json({ message: "Atividade excluída com sucesso." });
     } catch (error: any) {

@@ -16,6 +16,12 @@ export async function createActivityRepository(data: {
   });
 }
 
+export async function getActivityAddress(activityId: string) {
+  return await prisma.activityAddress.findUnique({
+    where: { activityId },
+  });
+}
+
 export async function getAllActivityTypes() {
   return await prisma.activityType.findMany({});
 }
@@ -29,6 +35,25 @@ export async function findCreatorById(userId: string) {
   return await prisma.user.findUnique({
     where: { id: userId },
     select: { name: true, avatar: true },
+  });
+}
+
+export async function upsertActivityAddressRepository(data: {
+  activityId: string;
+  latitude: number;
+  longitude: number;
+}) {
+  return await prisma.activityAddress.upsert({
+    where: { activityId: data.activityId },
+    update: {
+      latitude: data.latitude,
+      longitude: data.longitude,
+    },
+    create: {
+      activityId: data.activityId,
+      latitude: data.latitude,
+      longitude: data.longitude,
+    },
   });
 }
 
@@ -95,6 +120,13 @@ export async function updateActivityParticipant(
   });
 }
 
+export async function updateActivity(activityId: string, updatedFields: Partial<Activity>) {
+  return await prisma.activity.update({
+    where: { id: activityId },
+    data: updatedFields,
+  });
+}
+
 export async function deleteActivityById(userId: string, activityId: string) {
   return await prisma.activity.delete({
     where: { id: activityId, creatorId: userId },
@@ -148,4 +180,13 @@ export async function listActivitiesRepository(params: {
     prisma.activity.count({ where: whereClause }),
   ]);
   return { activities, totalActivities };
+}
+
+export async function subscribeActivityRepository(userId: string, activityId: string) {
+  return await prisma.activityParticipant.create({
+    data: {
+      userId,
+      activityId,
+    },
+  });
 }
