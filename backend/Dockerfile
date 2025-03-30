@@ -1,8 +1,8 @@
-FROM node:20.19.0-bullseye
+FROM node:20.19.0-slim
 
 WORKDIR /app
 
-COPY package.json .
+COPY package*.json .
 
 RUN npm i
 
