@@ -104,6 +104,7 @@ export async function deletaActivitiesRepository(
     },
   });
 }
+
 export async function createPreferenceRepository(
   newPreferences: Prisma.PreferenceCreateManyInput[]
 ) {
@@ -112,6 +113,7 @@ export async function createPreferenceRepository(
     skipDuplicates: true,
   });
 }
+
 export async function deactivateRepository(id: string) {
   return await prisma.user.update({
     where: { id },
@@ -139,5 +141,12 @@ export async function getUserRepository({ email, cpf }: userData) {
 export async function createUserRepository(data: userData) {
   return await prisma.user.create({
     data,
+  });
+}
+
+export async function updateUserXP(userId: string, newXp: number, newLevel: number) {
+  return await prisma.user.update({
+    where: { id: userId },
+    data: { xp: newXp, level: newLevel },
   });
 }

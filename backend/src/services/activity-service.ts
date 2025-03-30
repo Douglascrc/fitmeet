@@ -3,6 +3,11 @@ import * as activityRepository from "../repositories/activity-repository";
 import prisma from "../prisma-orm/prisma-client";
 import activityData from "../types/activity-creation";
 import { uploadImage } from "./s3-service";
+import { addExperience } from "./user-service";
+import { grantAchievement } from "./user-achievements-service";
+
+const XP_FOR_CHECKIN = 10;
+const XP_FOR_CREATOR = 20;
 
 export async function createActivity(
   userId: string,
@@ -56,6 +61,7 @@ export async function createActivity(
   });
 
   const creator = await activityRepository.findCreatorById(userId);
+  addExperience(userId, XP_FOR_CREATOR);
 
   return {
     id: activity.id,
@@ -190,15 +196,22 @@ export async function checkInActivity(
 
   if (participant) {
     if (participant.confirmedAt) {
-      throw new Error("E11"); // Check-in já realizado.
+      throw new Error("E11"); // C Você já confirmou sua participação nesta atividade.
     }
     if (!participant.approved) {
-      throw new Error("E9"); // Participação não aprovada.
+      throw new Error("E9"); // . Apenas participantes aprovados na atividade podem fazer check-in.
     }
     await activityRepository.updateActivityParticipantRepository(activityId, userId);
+
+    await addExperience(userId, XP_FOR_CHECKIN);
+    await addExperience(activity.creatorId, XP_FOR_CREATOR);
+
+    await grantAchievement("Primeiro Check-in", userId);
+    await grantAchievement("Criador de Atividades", activity.creatorId);
+
     return { message: "Participação confirmada." };
   } else {
-    throw new Error("E10"); // Código inválido ou participação não cadastrada.
+    throw new Error("E10"); // Código de confirmação incorreto.
   }
 }
 

@@ -8,6 +8,7 @@ import {
   getUserAuthRepository,
   updateAvatarById,
   updateUserRepository,
+  updateUserXP,
 } from "../repositories/user-repository";
 import userData from "../types/user-creation";
 import { uploadImage } from "./s3-service";
@@ -119,4 +120,22 @@ export async function updateUser(data: userData, userId: string) {
   }
 
   return await updateUserRepository(data, userId);
+}
+
+export async function addExperience(userId: string, xpToAdd: number) {
+  const user = await getUserAuthRepository(userId);
+  if (!user) {
+    throw new Error("E4"); // Usuário não encontrado
+  }
+
+  let totalXp = user.xp + xpToAdd;
+  let newLevel = user.level;
+  while (totalXp >= newLevel * 100) {
+    totalXp -= newLevel * 100;
+    newLevel++;
+  }
+
+  const newXp = user.xp + xpToAdd;
+
+  return await updateUserXP(userId, newXp, newLevel);
 }
