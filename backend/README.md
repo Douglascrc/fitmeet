@@ -57,18 +57,21 @@ Este é o backend de um sistema gamificado onde os usuários ganham experiência
 
 2. **Instale as dependências**
    ```bash
-   npm install
+   npm install 
    ```
 3. **Execução**
    ```bash
-   npx prisma generate
+   npx prisma generate //para executar as migrações do prisma
    ```
-   para executar as migrações do prisma
-   ```
-   npm run dev
-   ```
-   Rodar a aplicação com nodemon
 
+   ```bash
+   npm run dev //para rodar a aplicação com nodemon
+   ```
+
+   ```
+   npx prisma db seed  //para popular o banco de dados
+   ```
+   
 ## Uso do Docker
 
 1. **Certifique-se de ter Docker e Docker Compose instalados.**
