@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-async function main() {
+export async function main() {
   console.log("🌱 Populando o banco de dados...");
 
   const activityTypesData = [
@@ -156,19 +156,15 @@ async function main() {
 
   const achievements = await prisma.achievement.findMany();
   if (achievements.length > 0) {
-    const userAchievementsData = achievements
-      .slice(0, 2)
-      .map((achievement) => ({
-        userId: user.id,
-        achievementId: achievement.id,
-      }));
+    const userAchievementsData = achievements.slice(0, 2).map((achievement) => ({
+      userId: user.id,
+      achievementId: achievement.id,
+    }));
 
-    const userAchievementsDataforUser2 = achievements
-      .slice(2, 4)
-      .map((achievement) => ({
-        userId: user2.id,
-        achievementId: achievement.id,
-      }));
+    const userAchievementsDataforUser2 = achievements.slice(2, 4).map((achievement) => ({
+      userId: user2.id,
+      achievementId: achievement.id,
+    }));
 
     await prisma.userAchievement.createMany({
       data: [...userAchievementsData, ...userAchievementsDataforUser2],
