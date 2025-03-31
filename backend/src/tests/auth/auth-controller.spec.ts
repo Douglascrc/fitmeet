@@ -83,7 +83,7 @@ describe("Auth Controller", () => {
         name: "Test User",
         email: "douglas@gmail.com",
         cpf: "12345678901",
-        avatar: null,
+        avatar: "avatar.jpg",
         xp: 100,
         level: 1,
         achievements: [],
