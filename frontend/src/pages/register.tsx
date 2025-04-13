@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { forwardRef, useState } from "react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Logo from "@/assets/logoFitmeet.png";
 import backgroundFit from "@/assets/backgroundFit.png";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
+import { IMaskInput } from "react-imask";
 import {
   Form,
   FormControl,
@@ -16,18 +18,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
+import { auth_api } from "@/services/api-service";
+import { toast } from "sonner";
 
 const formSchema = z.object({
-  nome: z.string().min(2, {
+  name: z.string().min(2, {
     message: "O nome de usuário deve ter no mínimo 5 caracteres.",
   }),
-  email: z
-    .string({
-      required_error: "E-mail é obrigatório.",
-    })
-    .email({
-      message: "Formato de e-mail inválido.",
-    }),
+  email: z.string().min(1, "E-mail é obrigatório.").email("Formato de e-mail inválido."),
   password: z
     .string({
       required_error: "A senha é obrigatória",
@@ -43,11 +41,15 @@ const formSchema = z.object({
     .refine((cpf) => cpf.length === 11, "CPF deve conter exatamente 11 dígitos."),
 });
 
+const CustomInput = forwardRef<HTMLInputElement, any>((props, ref) => (
+  <IMaskInput {...props} inputRef={ref} />
+));
+
 export default function Register() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      nome: "",
+      name: "",
       email: "",
       password: "",
       cpf: "",
@@ -56,8 +58,15 @@ export default function Register() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const resp = await auth_api.post("/register", values);
+      console.log(resp.data);
+      toast.success("Conta criada com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao efetuar cadastro!");
+      console.log(error);
+    }
   }
 
   return (
@@ -86,10 +95,10 @@ export default function Register() {
           </p>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="nome"
+                name="name"
                 render={({ field }) => (
                   <FormItem className="relative">
                     <FormLabel>
@@ -105,14 +114,23 @@ export default function Register() {
               <FormField
                 control={form.control}
                 name="cpf"
-                render={({ field }) => (
+                render={({ field: { value, onChange, ref } }) => (
                   <FormItem className="relative">
                     <FormLabel>
                       CPF<span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex.: 123.456.789-01" {...field} />
+                      <CustomInput
+                        mask="000.000.000-00"
+                        unmask={true}
+                        placeholder="Ex.: 123.456.789-01"
+                        value={value}
+                        onAccept={onChange}
+                        inputRef={ref}
+                        className="w-full rounded-md border px-3 py-1 text-base"
+                      />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -127,6 +145,7 @@ export default function Register() {
                     <FormControl>
                       <Input placeholder="Ex.: joao@email.com" {...field}></Input>
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -159,9 +178,17 @@ export default function Register() {
 
               <Button
                 type="submit"
-                className="w-full bg-primary text-white py-2 rounded-md font-semibold hover:bg-primary-foreground"
+                disabled={form.formState.isSubmitting}
+                className="w-full bg-primary text-white py-2 rounded-md font-semibold cursor-pointer hover:bg-primary-foreground disabled:opacity-70"
               >
-                Cadastrar
+                {form.formState.isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Enviando...
+                  </span>
+                ) : (
+                  "Cadastrar"
+                )}
               </Button>
 
               <p className="text-sm text-center">
