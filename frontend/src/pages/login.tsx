@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Link, Navigate } from "react-router";
 import Logo from "@/assets/logoFitmeet.png";
 import backgroundFit from "@/assets/backgroundFit.png";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,8 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/UseAuth";
 
 const loginSchema = z.object({
   email: z.string({ required_error: "E-mail é obrigatório." }).email("Formato de e-mail inválido."),
@@ -26,6 +28,7 @@ const loginSchema = z.object({
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const { login, isAuthenticated } = useAuth();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -35,13 +38,21 @@ export default function Login() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof loginSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    try {
+      await login(values.email, values.password);
+      toast.success("Login realizado com sucesso!");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+        console.error(error);
+      }
+    }
   }
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Lado da Imagem */}
+      {isAuthenticated && <Navigate to="/" />}
       <div className="w-1/2">
         <img
           src={backgroundFit}
@@ -50,7 +61,6 @@ export default function Login() {
         />
       </div>
 
-      {/* Lado do Formulário */}
       <div className="w-1/2 flex flex-col justify-center items-start px-20">
         <div className="w-full max-w-md">
           <div className="flex items-center gap-2 mb-6">
@@ -101,7 +111,7 @@ export default function Login() {
                       />
                     </FormControl>
                     <span
-                      className="absolute top-9 right-3 cursor-pointer"
+                      className="absolute top-1/2 right-3 cursor-pointer"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -115,7 +125,14 @@ export default function Login() {
                 type="submit"
                 className="w-full bg-primary hover:bg-primary-foreground text-white font-semibold py-2 rounded-md"
               >
-                Entrar
+                {form.formState.isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Enviando...
+                  </span>
+                ) : (
+                  "Entrar"
+                )}
               </Button>
 
               <p className="text-sm text-center">

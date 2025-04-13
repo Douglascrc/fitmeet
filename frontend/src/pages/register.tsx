@@ -63,9 +63,8 @@ export default function Register() {
       const resp = await auth_api.post("/register", values);
       console.log(resp.data);
       toast.success("Conta criada com sucesso!");
-    } catch (error) {
-      toast.error("Erro ao efetuar cadastro!");
-      console.log(error);
+    } catch (error: any) {
+      toast.error(error);
     }
   }
 

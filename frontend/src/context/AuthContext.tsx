@@ -36,17 +36,11 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
 
     localStorage.setItem("@Auth.Token", respAuth.data.token);
 
-    auth_api.defaults.headers.common.Authorization = `Basic ${respAuth.data.token}`;
     user_api.defaults.headers.common.Authorization = `Basic ${respAuth.data.token}`;
     activities_api.defaults.headers.common.Authorization = `Basic ${respAuth.data.token}`;
-    const respUserInfo = await auth_api.get(`/${respAuth.data.id}`);
 
-    if (respUserInfo instanceof Error) {
-      return respUserInfo.message;
-    }
-
-    localStorage.setItem("@Auth.Data", JSON.stringify(respUserInfo.data));
-    setUserData(respUserInfo.data);
+    localStorage.setItem("@Auth.Data", JSON.stringify(respAuth.data));
+    setUserData(respAuth.data);
     setIsAuthenticated(true);
   }, []);
 

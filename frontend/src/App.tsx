@@ -8,7 +8,7 @@ import { Toaster } from "sonner";
 function App() {
   return (
     <>
-      <Toaster />
+      <Toaster position="top-right" toastOptions={{ duration: 2000 }} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
