@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Logo from "@/assets/logoFitmeet.png";
-import { ChevronLeft, ChevronRight, Pencil, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import { activities_api, user_api } from "@/services/api-service";
 import { Link } from "react-router";
 import UserModel from "@/models/user-model";
@@ -11,6 +10,7 @@ import Activity from "@/models/activity-model";
 import MedalIcon from "@/assets/conquista.svg";
 import trofeuImg from "@/assets/trofeu.png";
 import AchievementCard from "@/components/achievementCard";
+import Header from "@/components/header";
 
 export default function Profile() {
   console.log("Profile component is rendering");
@@ -75,27 +75,7 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen w-full px-4">
-      <header className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <img src={Logo} alt="Fitmeet Logo" className="w-8 h-8" />
-          <h1 className="text-lg font-bold text-primary">FITMEET</h1>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            className="text-base cursor-pointer bg-primary hover:bg-primary-foreground"
-          >
-            <Plus size={16} />
-            Criar atividade
-          </Button>
-          <Avatar className="border-1 border-white outline-2 outline-primary">
-            <AvatarImage src={user?.avatar || "https://github.com/shadcn.png"} />
-            <AvatarFallback>{user?.name ? user.name : "Username"}</AvatarFallback>
-          </Avatar>
-        </div>
-      </header>
-
+      <Header avatar={user?.avatar || "https://github.com/shadcn.png"} name={user?.name} />
       <section className="relative mb-8">
         <div className="flex flex-col items-center">
           <Avatar className="w-32 h-32">

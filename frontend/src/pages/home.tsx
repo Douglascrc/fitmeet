@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -6,8 +5,6 @@ import Calendar from "@/assets/calendar.svg";
 import Group from "@/assets/group.svg";
 import { Separator } from "@/components/ui/separator";
 import { Link, useSearchParams } from "react-router";
-import { Plus } from "lucide-react";
-import Logo from "@/assets/logoFitmeet.png";
 import activityImage from "@/assets/activity.jpeg";
 import { useEffect, useState, useCallback } from "react";
 import { activities_api, user_api } from "@/services/api-service";
@@ -15,6 +12,7 @@ import Activity from "@/models/activity-model";
 import ActivityType from "@/models/activityType-model";
 import UserModel from "@/models/user-model";
 import privateIcon from "@/assets/private.svg";
+import Header from "@/components/header";
 
 export default function Home() {
   const [user, setUser] = useState<UserModel | null>(null);
@@ -110,25 +108,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full">
-      <header className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <img src={Logo} alt="Fitmeet Logo" className="w-8 h-8" />
-          <h1 className="text-lg font-bold text-primary">FITMEET</h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            className="text-base cursor-pointer bg-primary hover:bg-primary-foreground"
-          >
-            <Plus size={16} />
-            Criar atividade
-          </Button>
-          <Avatar className="border-1 border-white outline-2 outline-primary">
-            <AvatarImage src={user?.avatar || "https://github.com/shadcn.png"} />
-            <AvatarFallback>A</AvatarFallback>
-          </Avatar>
-        </div>
-      </header>
+      <Header avatar={user?.avatar || "https://github.com/shadcn.png"} name={user?.name} />
 
       <section className="mb-8 w-full">
         <h2 className="text-base mb-4 text-start font-bold">Recomendado para você</h2>
