@@ -1,4 +1,4 @@
-import { UserModel } from "@/models/user-model";
+import UserModel from "@/models/user-model";
 import { activities_api, auth_api, user_api } from "@/services/api-service";
 import { createContext, useCallback, useEffect, useState } from "react";
 import { Navigate } from "react-router";
@@ -36,8 +36,8 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
 
     localStorage.setItem("@Auth.Token", respAuth.data.token);
 
-    user_api.defaults.headers.common.Authorization = `Basic ${respAuth.data.token}`;
-    activities_api.defaults.headers.common.Authorization = `Basic ${respAuth.data.token}`;
+    user_api.defaults.headers.common.Authorization = `Bearer ${respAuth.data.token}`;
+    activities_api.defaults.headers.common.Authorization = `Bearer ${respAuth.data.token}`;
 
     localStorage.setItem("@Auth.Data", JSON.stringify(respAuth.data));
     setUserData(respAuth.data);
@@ -53,7 +53,12 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated: isAuthenticated, ...userData, login: Login, logout: Logout }}
+      value={{
+        isAuthenticated: isAuthenticated,
+        ...userData,
+        login: Login,
+        logout: Logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
