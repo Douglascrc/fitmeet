@@ -7,6 +7,7 @@ import { Toaster } from "sonner";
 import Profile from "./pages/profile";
 import { PrivateRoutes } from "./utils/privateRoutes";
 import { AuthProvider } from "./context/AuthContext";
+import EditProfile from "./pages/editProfile";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
 
           <Route path="" element={<PrivateRoutes />}>
             <Route path="/perfil" element={<Profile />} />
+            <Route path="/editar" element={<EditProfile />} />
           </Route>
         </Routes>
       </BrowserRouter>

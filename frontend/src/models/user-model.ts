@@ -7,7 +7,7 @@ type UserModel = {
   avatar?: string;
   xp?: number;
   level?: number;
-  achievements?: string[];
+  achievements?: { name: string; criterion: string }[];
 };
 
 export default UserModel;

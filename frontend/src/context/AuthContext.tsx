@@ -16,16 +16,21 @@ interface Props {
 }
 
 export const AuthProvider: React.FC<Props> = ({ children }) => {
-  const [userData, setUserData] = useState<UserModel>();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const storedData = localStorage.getItem("@Auth.Data");
+  const initialAuth = !!storedData && Object.keys(JSON.parse(storedData)).length > 0;
+
+  const [userData, setUserData] = useState<UserModel | undefined>(
+    storedData ? JSON.parse(storedData) : undefined
+  );
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(initialAuth);
 
   useEffect(() => {
-    const data: UserModel = JSON.parse(localStorage.getItem("@Auth.Data") || "{}");
-    if (data.id) {
-      setIsAuthenticated(true);
-      setUserData(data);
+    const token = localStorage.getItem("@Auth.Token");
+    if (token && isAuthenticated) {
+      user_api.defaults.headers.common.Authorization = `Bearer ${token}`;
+      activities_api.defaults.headers.common.Authorization = `Bearer ${token}`;
     }
-  }, []);
+  }, [isAuthenticated]);
 
   const Login = useCallback(async (email: string, password: string) => {
     const respAuth = await auth_api.post("/sign-in", { email, password });
