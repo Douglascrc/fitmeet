@@ -9,7 +9,7 @@ import UserModel from "@/models/user-model";
 import Activity from "@/models/activity-model";
 import MedalIcon from "@/assets/conquista.svg";
 import trofeuImg from "@/assets/trofeu.png";
-import AchievementCard from "@/components/achievementCard";
+
 import Header from "@/components/header";
 
 export default function Profile() {
@@ -19,6 +19,7 @@ export default function Profile() {
   const [historicActivities, setHistoricActivities] = useState<Activity[]>([]);
 
   const [page, setPage] = useState(1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [pageSize, setPageSize] = useState(4);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -76,10 +77,13 @@ export default function Profile() {
   return (
     <div className="min-h-screen w-full px-4">
       <Header avatar={user?.avatar || "https://github.com/shadcn.png"} name={user?.name} />
-      <section className="relative mb-8">
+      <section className="relative mt-10">
         <div className="flex flex-col items-center">
-          <Avatar className="w-32 h-32">
-            <AvatarImage src={user?.avatar || "https://github.com/shadcn.png"} />
+          <Avatar className="w-48 h-48">
+            <AvatarImage
+              className="object-cover"
+              src={user?.avatar || "https://github.com/shadcn.png"}
+            />
             <AvatarFallback>{user?.name || "A"}</AvatarFallback>
           </Avatar>
           <h2 className="text-2xl font-heading font-bold mt-4">{user?.name || "Carregando..."}</h2>
@@ -99,54 +103,68 @@ export default function Profile() {
         </Link>
       </section>
 
-      <section className="flex flex-col sm:flex-row justify-center gap-4 mb-8 w-full items-start">
-        {/* Card de nível */}
-        <Card className="relative bg-gray-100 w-full sm:max-w-md px-4 py-2 rounded-2xl shadow-md overflow-hidden flex flex-col top-10">
-          <div className="flex justify-between items-center mb-1">
+      <section className="flex flex-col md:flex-row justify-center items-stretch gap-6 md:gap-8 mt-8 mb-8 w-full max-w-4xl mx-auto">
+        <Card className="relative bg-gray-50 w-full md:w-1/2 p-6 rounded-2xl shadow-lg overflow-hidden flex flex-col justify-between">
+          {" "}
+          <div className="flex justify-between items-start mb-4">
+            {" "}
             <div>
-              <CardTitle className="text-sm font-bold text-green-900">Seu nível é</CardTitle>
-              <p className="text-xl font-extrabold text-green-800 mt-0">{user?.level || "0"}</p>
+              <CardTitle className="text-sm font-semibold text-gray-600 mb-1">
+                Seu nível é
+              </CardTitle>{" "}
+              <p className="text-4xl font-extrabold text-gray-800 leading-none">
+                {user?.level || "0"}
+              </p>{" "}
             </div>
-
             <img
               src={trofeuImg}
               alt="Troféu"
-              className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-lg"
+              className="w-20 h-auto object-contain drop-shadow-lg mt-1"
             />
           </div>
-
-          <div className="mt-0">
-            <p className="text-xs text-green-900 mb-0">Pontos para o próximo nível</p>
-            <p className="text-xs font-medium text-green-800">{user?.xp || 0}/50 pts</p>
-
-            <div className="w-full h-1.5 bg-white rounded-full shadow-inner mt-0.5 mb-1">
+          <div className="mt-auto">
+            {" "}
+            <div className="flex justify-between items-end mb-1">
+              {" "}
+              <p className="text-xs text-gray-600">Pontos para o próximo nível</p>
+              <p className="text-sm font-medium text-gray-800">{user?.xp || 0}/50 pts</p>
+            </div>
+            <div className="w-full h-1.5 bg-gray-200 rounded-full shadow-inner">
               <div
-                className="h-full bg-green-600 rounded-full transition-all duration-500 ease-in-out"
-                style={{ width: `${((user?.xp ?? 0) / 50) * 100}%` }}
+                className="h-full bg-green-500 rounded-full transition-all duration-500 ease-in-out"
+                style={{ width: `${Math.min(((user?.xp ?? 0) / 50) * 100, 100)}%` }}
               />
             </div>
           </div>
         </Card>
+        <Card className="bg-gray-50 w-full md:w-1/2 p-6 rounded-2xl shadow-lg overflow-hidden flex flex-col">
+          {" "}
+          <CardContent className="flex-grow flex items-center justify-center">
+            {" "}
+            {user?.achievements && user.achievements.length > 0 ? (
+              <div className="flex flex-wrap justify-center items-start gap-x-6 gap-y-4">
+                {" "}
+                {user.achievements.map((achievement, index) => (
+                  <div key={index} className="flex flex-col items-center text-center w-20">
+                    <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-1.5 shadow-inner">
+                      <img
+                        src={MedalIcon}
+                        alt={achievement.name}
+                        className="w-10 h-10 drop-shadow-md"
+                      />
+                    </div>
 
-        {/* Card de conquistas */}
-        <Card className="bg-transparent w-full sm:max-w-md px-4 overflow-y-auto border-0">
-          <CardContent className="h-full p-0 pt-4">
-            <div className="space-y-3">
-              {user?.achievements && user.achievements.length > 0 ? (
-                user.achievements.map((achievement, index) => (
-                  <AchievementCard
-                    key={index}
-                    title={achievement.name}
-                    iconSrc={MedalIcon}
-                    description={achievement.name}
-                  />
-                ))
-              ) : (
-                <p className="text-center text-sm text-gray-500">
-                  Complete atividades para ganhar conquistas!
-                </p>
-              )}
-            </div>
+                    <p className="text-xs font-medium text-gray-700 leading-tight">
+                      {achievement.name}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-sm text-gray-500">
+                Complete atividades para ganhar conquistas!
+              </p>
+            )}
           </CardContent>
         </Card>
       </section>
