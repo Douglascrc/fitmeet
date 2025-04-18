@@ -20,6 +20,7 @@ import { Calendar } from "./ui/calendar";
 import { ptBR } from "date-fns/locale";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Label } from "./ui/label";
+import { Link } from "react-router";
 
 type headerProps = {
   avatar: string;
@@ -67,7 +68,7 @@ export default function Header({ avatar, name }: headerProps) {
   const [open, setOpen] = useState(false);
   const [activityTypes, setActivityTypes] = useState<ActivityType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [mapCenter, setMapCenter] = useState(defaultCenter); // Estado para centro do mapa
+  const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [markerPosition, setMarkerPosition] = useState<{ lat: number; lng: number } | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -76,9 +77,9 @@ export default function Header({ avatar, name }: headerProps) {
     if (!isOpen) {
       form.reset();
       setMarkerPosition(null);
-      setImagePreview(null); // Reset preview
+      setImagePreview(null);
       if (imagePreview) {
-        URL.revokeObjectURL(imagePreview); // Clean up old preview
+        URL.revokeObjectURL(imagePreview);
       }
     }
   };
@@ -167,8 +168,8 @@ export default function Header({ avatar, name }: headerProps) {
     formData.append("title", values.title);
     formData.append("description", values.description);
     formData.append("scheduledDate", values.scheduledDate.toISOString());
-    formData.append("typeId", values.activityType); // Chave já corrigida
-    formData.append("private", String(values.requiresApproval)); // Chave já corrigida
+    formData.append("typeId", values.activityType);
+    formData.append("private", String(values.requiresApproval));
 
     if (values.location?.latitude && values.location?.longitude) {
       const addressObject = {
@@ -523,11 +524,15 @@ export default function Header({ avatar, name }: headerProps) {
               </form>
             </Form>
           </Modal>
-
-          <Avatar className="border-1 border-white outline-2 outline-primary">
-            <AvatarImage src={avatar} />
-            <AvatarFallback>{name || "Username"}</AvatarFallback>
-          </Avatar>
+          <Link to="/perfil">
+            {" "}
+            {/* Aponta para a página de perfil */}
+            <Avatar className="w-10 h-10 border-2 border-white outline-2 outline-primary cursor-pointer">
+              {" "}
+              <AvatarImage src={avatar} />
+              <AvatarFallback>{name ? name.charAt(0).toUpperCase() : "U"}</AvatarFallback>
+            </Avatar>
+          </Link>
         </div>
       </header>
     </>
