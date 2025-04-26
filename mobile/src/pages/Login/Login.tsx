@@ -211,17 +211,18 @@ const styles = StyleSheet.create({
   },
   appName: {
     fontSize: 24,
-    fontWeight: 'bold',
     color: '#00BC7D',
     fontFamily: 'BebasNeue-Regular',
+    fontWeight: 'semibold',
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
+
     marginBottom: 8,
     textAlign: 'left',
     color: '#1F2937',
     fontFamily: 'BebasNeue-Regular',
+    fontWeight: 'semibold',
   },
   subtitle: {
     fontSize: 16,
@@ -229,7 +230,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     textAlign: 'left',
     lineHeight: 20,
-    fontFamily: 'DM Sans',
+    fontFamily: 'DMSans',
   },
   form: {
     width: '100%',
@@ -242,7 +243,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 6,
     color: '#374151',
-    fontFamily: 'DM Sans',
+    fontFamily: 'DMSans',
   },
   required: {
     color: '#EF4444',
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: '#FFFFFF',
     color: '#1F2937',
-    fontFamily: 'DM Sans',
+    fontFamily: 'DMSans',
   },
   passwordContainer: {
     flexDirection: 'row',
