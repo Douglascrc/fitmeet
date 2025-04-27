@@ -2,6 +2,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Home from '../pages/Home/Home';
 import Login from '../pages/Login/Login';
 import {NavigationContainer} from '@react-navigation/native';
+import {Register} from '../pages/Register/Register';
 
 export type MainStackParamList = {
   Login: {name: string; isError: boolean};
@@ -17,6 +18,7 @@ function MainStackScreen() {
       <MainStack.Group screenOptions={{headerShown: false}}>
         <MainStack.Screen name="Home" component={Home} />
         <MainStack.Screen name="Login" component={Login} />
+        <MainStack.Screen name="Register" component={Register} />
       </MainStack.Group>
     </MainStack.Navigator>
   );
