@@ -15,7 +15,7 @@ import {
   Image,
 } from 'react-native';
 //@ts-ignore
-import Logo from '../../assets/fitmeet.png';
+import Logo from '../../assets/images/fitmeet.png';
 import {Eye, EyeSlash} from 'phosphor-react-native';
 
 const loginApi = async (email: any, password: any) => {
