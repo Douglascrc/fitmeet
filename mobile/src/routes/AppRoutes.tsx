@@ -3,6 +3,12 @@ import Home from '../pages/Home/Home';
 import Login from '../pages/Login/Login';
 import {NavigationContainer} from '@react-navigation/native';
 
+export type MainStackParamList = {
+  Login: {name: string; isError: boolean};
+  Register: {name: string; isError: boolean};
+  Home: {name: string; isError: boolean};
+};
+
 const MainStack = createStackNavigator();
 
 function MainStackScreen() {
