@@ -27,11 +27,31 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  level: {
-    backgroundColor: '#FFCE52',
-    padding: 4,
-    borderRadius: 4,
+  levelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: 52,
+    height: 33,
+    paddingTop: 8,
+    paddingRight: 12,
+    paddingBottom: 8,
+    paddingLeft: 12,
+    borderRadius: 5,
+    borderWidth: 1, // Borda mais espessa conforme Figma
+    borderColor: '#FFFFFF',
     marginRight: 8,
+    gap: 6, // Espaçamento entre a estrela e o número
+  },
+  star: {
+    width: 16,
+    height: 16,
+  },
+  level: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    padding: 0,
+    lineHeight: 16,
+    textAlignVertical: 'center',
     color: '#FFFFFF',
   },
   profileImage: {
@@ -57,7 +77,7 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   seeMore: {
-    color: '#00BC7D',
+    color: '#000000',
     fontSize: 12,
   },
   activityCard: {
@@ -78,15 +98,20 @@ export const styles = StyleSheet.create({
   },
   activityInfo: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     padding: 12,
     paddingTop: 0,
+    gap: 8,
   },
   activityDate: {
     fontSize: 12,
     color: '#666666',
   },
   participants: {
+    fontSize: 12,
+    color: '#666666',
+  },
+  separator: {
     fontSize: 12,
     color: '#666666',
   },

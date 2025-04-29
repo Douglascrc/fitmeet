@@ -8,17 +8,30 @@ import {
   SafeAreaView,
 } from 'react-native';
 import {styles} from './style';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+// @ts-ignore
+import Star from '../../assets/images/star.png';
+import {ActivitySection} from '../../components/ActivitySection/ActivitySection';
+import {ActivityCard} from '../../components/activityCard';
 
 function Home() {
+  const insets = useSafeAreaInsets();
+
+  const navigateToAllActivities = () => {
+    console.log('Navegar para todas as atividades');
+  };
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, {paddingTop: insets.top}]}>
         <View>
           <Text style={styles.greeting}>Olá, Seja Bem Vindo</Text>
           <Text style={styles.userName}>Nome!</Text>
         </View>
         <View style={styles.profileContainer}>
-          <Text style={styles.level}>5</Text>
+          <View style={styles.levelContainer}>
+            <Image source={Star} style={styles.star} />
+            <Text style={styles.level}>5</Text>
+          </View>
           <Image
             source={{uri: 'https://github.com/shadcn.png'}}
             style={styles.profileImage}
@@ -27,27 +40,23 @@ function Home() {
       </View>
 
       <ScrollView style={styles.content}>
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>SUAS RECOMENDAÇÕES</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeMore}>VER MAIS</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Cards de Atividades */}
-          <View style={styles.activityCard}>
-            <Image
-              source={require('../../assets/images/activity.jpeg')}
-              style={styles.activityImage}
-            />
-            <Text style={styles.activityTitle}>Título da atividade</Text>
-            <View style={styles.activityInfo}>
-              <Text style={styles.activityDate}>28/01/2025 08:00</Text>
-              <Text style={styles.participants}>4</Text>
-            </View>
-          </View>
-        </View>
+        <ActivitySection
+          type="viewMore"
+          title="Suas Recomendações"
+          onPress={navigateToAllActivities}>
+          <ActivityCard
+            title="Título da Atividade"
+            date="12/10/2023"
+            participants={4}
+            imageSource={require('../../assets/images/activity.jpeg')}
+          />
+          <ActivityCard
+            title="Título da atividade"
+            date="30/01/2025 09:00"
+            participants={2}
+            imageSource={require('../../assets/images/activity.jpeg')}
+          />
+        </ActivitySection>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>CATEGORIAS</Text>
