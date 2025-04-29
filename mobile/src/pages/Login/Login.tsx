@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState} from "react";
 import {
   SafeAreaView,
   StatusBar,
@@ -12,74 +12,62 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-} from 'react-native';
+} from "react-native";
 //@ts-ignore
-import Logo from '../../assets/images/fitmeet.png';
-import {Eye, EyeSlash} from 'phosphor-react-native';
-import {styles} from './style';
-import {useTypedNavigation} from '../../hooks/useTypedNavigation';
-
-const login = async (email: any, password: any) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (email === 'teste@email.com' && password === 'senha123') {
-        console.log('Login API: Sucesso');
-        resolve({token: 'fake-token', user: {name: 'Usuário Teste'}});
-      } else {
-        console.log('Login API: Falha');
-        reject(new Error('E-mail ou senha inválidos.'));
-      }
-    }, 1500);
-  });
-};
+import Logo from "../../assets/images/fitmeet.png";
+import {Eye, EyeSlash} from "phosphor-react-native";
+import {styles} from "./style";
+import {useTypedNavigation} from "../../hooks/useTypedNavigation";
+import useAppContext from "../../hooks/useContext";
 
 function App() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useTypedNavigation();
-  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const {login, isAuthenticated} = useAppContext();
+
   const navigateToRegister = () => {
     navigation.navigate({
-      name: 'Register',
-      params: {name: 'User', isError: false},
+      name: "Register",
+      params: {name: "User", isError: false},
     });
   };
 
   const navigateToHome = () => {
-    navigation.navigate({name: 'Home', params: {name: 'User', isError: false}});
+    navigation.navigate({name: "Home", params: {name: "User", isError: false}});
   };
 
   const handleLogin = async () => {
     if (!email) {
-      Alert.alert('Erro', 'E-mail é obrigatório.');
+      Alert.alert("Erro", "E-mail é obrigatório.");
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert('Erro', 'Formato de e-mail inválido.');
+      Alert.alert("Erro", "Formato de e-mail inválido.");
       return;
     }
     if (!password) {
-      Alert.alert('Erro', 'Senha é obrigatória.');
+      Alert.alert("Erro", "Senha é obrigatória.");
       return;
     }
     if (password.length < 6) {
-      Alert.alert('Erro', 'A senha deve ter no mínimo 6 caracteres.');
+      Alert.alert("Erro", "A senha deve ter no mínimo 6 caracteres.");
       return;
     }
 
     setIsLoading(true);
     try {
-      await login(email, password);
-      // setIsAuthenticated(true);
-      Alert.alert('Sucesso', 'Login realizado com sucesso!');
+      login(email, password);
+
+      Alert.alert("Sucesso", "Login realizado com sucesso!");
       navigateToHome();
     } catch (error: any) {
       Alert.alert(
-        'Erro no Login',
-        error?.message || 'Não foi possível fazer login.',
+        "Erro no Login",
+        error?.message || "Não foi possível fazer login.",
       );
       console.error(error);
     } finally {
@@ -91,12 +79,11 @@ function App() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <View style={styles.content}>
             <View style={styles.logoContainer}>
-              {/* <Image source={Logo} style={styles.logo} /> */}
               <Image source={Logo} style={styles.logo} />
               <Text style={styles.appName}>FITMEET</Text>
             </View>
@@ -166,7 +153,7 @@ function App() {
 
               <View style={styles.registerContainer}>
                 <Text style={styles.registerText}>
-                  Ainda não tem uma conta?{' '}
+                  Ainda não tem uma conta?{" "}
                 </Text>
                 <TouchableOpacity
                   onPress={navigateToRegister}
