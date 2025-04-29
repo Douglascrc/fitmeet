@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
-import {styles} from './styles';
+import {styles} from '../pages/Home/style';
 import {CaretDown} from 'phosphor-react-native';
 
 interface ActivitySectionProps {

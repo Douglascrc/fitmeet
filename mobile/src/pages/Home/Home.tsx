@@ -11,8 +11,8 @@ import {styles} from './style';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 // @ts-ignore
 import Star from '../../assets/images/star.png';
-import {ActivitySection} from '../../components/ActivitySection/ActivitySection';
-import {ActivityCard} from '../../components/activityCard';
+import {ActivitySection} from '../../components/ActivitySection';
+import {ActivityCard} from '../../components/ActivityCard';
 
 function Home() {
   const insets = useSafeAreaInsets();

@@ -37,10 +37,10 @@ export const styles = StyleSheet.create({
     paddingBottom: 8,
     paddingLeft: 12,
     borderRadius: 5,
-    borderWidth: 1, // Borda mais espessa conforme Figma
+    borderWidth: 1,
     borderColor: '#FFFFFF',
     marginRight: 8,
-    gap: 6, // Espaçamento entre a estrela e o número
+    gap: 6,
   },
   star: {
     width: 16,
