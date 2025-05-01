@@ -1,13 +1,15 @@
-import {createStackNavigator} from '@react-navigation/stack';
-import Home from '../pages/Home/Home';
-import Login from '../pages/Login/Login';
-import {NavigationContainer} from '@react-navigation/native';
-import {Register} from '../pages/Register/Register';
+import {createStackNavigator} from "@react-navigation/stack";
+import Home from "../pages/Home/Home";
+import Login from "../pages/Login/Login";
+import {NavigationContainer} from "@react-navigation/native";
+import {Register} from "../pages/Register/Register";
+import ActivityCategory from "../pages/ActivityCategory/ActivityCategory";
 
 export type MainStackParamList = {
   Login: {name: string; isError: boolean};
   Register: {name: string; isError: boolean};
   Home: {name: string; isError: boolean};
+  Activities: {categoryId: string; categoryName: string};
 };
 
 const MainStack = createStackNavigator();
@@ -19,6 +21,7 @@ function MainStackScreen() {
         <MainStack.Screen name="Home" component={Home} />
         <MainStack.Screen name="Login" component={Login} />
         <MainStack.Screen name="Register" component={Register} />
+        <MainStack.Screen name="Activities" component={ActivityCategory} />
       </MainStack.Group>
     </MainStack.Navigator>
   );
