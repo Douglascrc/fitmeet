@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
-import {styles} from '../pages/Home/style';
-import {CaretDown} from 'phosphor-react-native';
+import React, {useState} from "react";
+import {View, Text, TouchableOpacity} from "react-native";
+import {styles} from "../pages/Home/style";
+import {CaretDown} from "phosphor-react-native";
 
 interface ActivitySectionProps {
   title: string;
-  type: 'viewMore' | 'dropdown';
+  type: "viewMore" | "dropdown";
   children: React.ReactNode;
   onPress?: () => void;
 }
@@ -17,12 +17,15 @@ export function ActivitySection({
   onPress,
 }: ActivitySectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [showViewMore, setShowViewMore] = useState(type === "viewMore");
 
   const handlePress = () => {
-    if (type === 'dropdown') {
+    if (type === "viewMore" && showViewMore) {
+      setShowViewMore(false);
+      if (onPress) onPress();
+    } else {
       setIsExpanded(!isExpanded);
-    } else if (onPress) {
-      onPress();
+      if (onPress) onPress();
     }
   };
 
@@ -31,19 +34,17 @@ export function ActivitySection({
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>{title}</Text>
 
-        {type === 'viewMore' ? (
-          <TouchableOpacity onPress={handlePress}>
+        <TouchableOpacity onPress={handlePress}>
+          {type === "viewMore" && showViewMore ? (
             <Text style={styles.seeMore}>VER MAIS</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity onPress={handlePress}>
+          ) : (
             <CaretDown
               size={24}
               color="#000000"
-              style={{transform: [{rotate: isExpanded ? '0deg' : '180deg'}]}}
+              style={{transform: [{rotate: isExpanded ? "0deg" : "180deg"}]}}
             />
-          </TouchableOpacity>
-        )}
+          )}
+        </TouchableOpacity>
       </View>
 
       {isExpanded && children}
