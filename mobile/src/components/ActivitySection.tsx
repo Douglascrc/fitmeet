@@ -17,15 +17,12 @@ export function ActivitySection({
   onPress,
 }: ActivitySectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [showViewMore, setShowViewMore] = useState(type === "viewMore");
 
   const handlePress = () => {
-    if (type === "viewMore" && showViewMore) {
-      setShowViewMore(false);
+    if (type === "viewMore") {
       if (onPress) onPress();
     } else {
       setIsExpanded(!isExpanded);
-      if (onPress) onPress();
     }
   };
 
@@ -35,7 +32,7 @@ export function ActivitySection({
         <Text style={styles.sectionTitle}>{title}</Text>
 
         <TouchableOpacity onPress={handlePress}>
-          {type === "viewMore" && showViewMore ? (
+          {type === "viewMore" ? (
             <Text style={styles.seeMore}>VER MAIS</Text>
           ) : (
             <CaretDown
@@ -47,7 +44,7 @@ export function ActivitySection({
         </TouchableOpacity>
       </View>
 
-      {isExpanded && children}
+      {(type === "viewMore" || isExpanded) && children}
     </View>
   );
 }
