@@ -9,21 +9,14 @@ import {
   StatusBar,
   Dimensions,
 } from "react-native";
-import {SafeAreaView, useSafeAreaInsets} from "react-native-safe-area-context";
+import {SafeAreaView} from "react-native-safe-area-context";
 import useAppContext from "../../hooks/useContext";
 import {activities_api, user_api} from "../../services/api";
 import {ActivityCard} from "../../components/ActivityCard";
 import {styles} from "./style";
 import {Activity, User} from "../Home/Home";
 import {useTypedNavigation} from "../../hooks/useTypedNavigation";
-// Você precisará importar ícones do phosphor-react-native ou outra biblioteca
-import {
-  CaretLeft,
-  Medal,
-  PencilSimple,
-  Share,
-  SignOut,
-} from "phosphor-react-native";
+import {CaretLeft, Medal, PencilSimple, SignOut} from "phosphor-react-native";
 import {ActivitySection} from "../../components/ActivitySection";
 
 const {width} = Dimensions.get("window");
@@ -38,7 +31,6 @@ export function Profile() {
 
   const flatListRef = useRef<FlatList>(null);
   const navigation = useTypedNavigation();
-  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     fetchUserData();
@@ -179,23 +171,23 @@ export function Profile() {
       />
 
       <View style={styles.header}>
-        <SafeAreaView style={[styles.headerSafeArea, {paddingTop: insets.top}]}>
+        <SafeAreaView style={styles.headerSafeArea}>
           <TouchableOpacity
             style={styles.headerLeft}
             activeOpacity={1}
             hitSlop={{top: 25, bottom: 25, left: 25, right: 25}}
             onPress={() => navigation.goBack()}>
-            <CaretLeft size={24} />
+            <CaretLeft size={32} />
           </TouchableOpacity>
 
           <Text style={styles.headerTitle}>PERFIL</Text>
 
           <View style={styles.headerButtons}>
             <TouchableOpacity style={styles.iconButton}>
-              <PencilSimple size={20} />
+              <PencilSimple size={32} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButton}>
-              <SignOut size={20} />
+              <SignOut size={32} />
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -213,7 +205,9 @@ export function Profile() {
         <Text style={styles.name}>{user?.name}</Text>
       </View>
 
-      <View style={[styles.scrollView, styles.scrollContent]}>
+      <ScrollView
+        style={[styles.scrollView]}
+        contentContainerStyle={styles.scrollContent}>
         <View style={styles.carouselContainer}>
           <FlatList
             ref={flatListRef}
@@ -237,11 +231,10 @@ export function Profile() {
 
         <View style={styles.activitiesSection}>
           <ActivitySection title="SUAS ATIVIDADES" type="dropdown">
-            <FlatList
-              data={userActivities}
-              keyExtractor={item => item.id}
-              renderItem={({item}) => (
+            {userActivities.length > 0 ? (
+              userActivities.map(item => (
                 <ActivityCard
+                  key={item.id}
                   title={item.title}
                   date={`${new Date(item.scheduledDate).toLocaleDateString(
                     "pt-BR",
@@ -258,47 +251,41 @@ export function Profile() {
                   }}
                   isPrivate={item.private}
                 />
-              )}
-              ListEmptyComponent={
-                <Text style={styles.noActivities}>
-                  Nenhuma atividade encontrada
-                </Text>
-              }
-              scrollEnabled={false}
-              nestedScrollEnabled={true}
-              style={{height: "auto"}}
-            />
+              ))
+            ) : (
+              <Text style={styles.noActivities}>
+                Nenhuma atividade encontrada
+              </Text>
+            )}
           </ActivitySection>
         </View>
 
         <View style={styles.activitiesSection}>
           <ActivitySection title="Histórico de Atividades" type="dropdown">
-            <FlatList
-              data={userActivities}
-              keyExtractor={item => item.id}
-              renderItem={({item}) => (
-                <ActivityCard
-                  title={item.title}
-                  date={`${new Date(item.scheduledDate).toLocaleDateString(
-                    "pt-BR",
-                  )} ${new Date(item.scheduledDate).toLocaleTimeString(
-                    "pt-BR",
-                    {hour: "2-digit", minute: "2-digit", hour12: false},
-                  )}`}
-                  participants={item.participantCount}
-                  imageSource={{
-                    uri: item.image?.replace(
-                      "http://localhost",
-                      "http://10.0.2.2",
-                    ),
-                  }}
-                  isPrivate={item.private}
-                />
-              )}
-            />
+            {userActivities.map(item => (
+              <ActivityCard
+                key={item.id}
+                title={item.title}
+                date={`${new Date(item.scheduledDate).toLocaleDateString(
+                  "pt-BR",
+                )} ${new Date(item.scheduledDate).toLocaleTimeString("pt-BR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}`}
+                participants={item.participantCount}
+                imageSource={{
+                  uri: item.image?.replace(
+                    "http://localhost",
+                    "http://10.0.2.2",
+                  ),
+                }}
+                isPrivate={item.private}
+              />
+            ))}
           </ActivitySection>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }

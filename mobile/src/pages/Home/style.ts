@@ -183,6 +183,11 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
   },
+  activityImage: {
+    width: "100%",
+    height: 160,
+    resizeMode: "cover",
+  },
   infoIcon: {
     width: 16,
     height: 16,
