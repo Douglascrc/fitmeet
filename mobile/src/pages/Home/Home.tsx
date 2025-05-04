@@ -23,7 +23,14 @@ import {CategoryHeader} from "../../components/CategoryHeader";
 import {PreferencesModal} from "../../components/ModalPreferences";
 import {useTypedNavigation} from "../../hooks/useTypedNavigation";
 
-type User = {
+type ActivitiesByCategory = {
+  [categoryId: string]: {
+    name: string;
+    activities: Activity[];
+  };
+};
+
+export type User = {
   id: string;
   name: string;
   email: string;
@@ -60,6 +67,8 @@ function Home() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
     null,
   );
+  const [activitiesByCategory, setActivitiesByCategory] =
+    useState<ActivitiesByCategory>({});
   const [user, setUser] = useState<User>();
   const [isLoading, setIsLoading] = useState(true);
   const insets = useSafeAreaInsets();
@@ -71,7 +80,7 @@ function Home() {
   const [recommendedActivities, setRecommendedActivities] = useState<
     Activity[]
   >([]);
-  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
+
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
   const navigation = useTypedNavigation();
 
@@ -85,7 +94,7 @@ function Home() {
     try {
       if (token) {
         const response = await user_api.get("/preferences");
-        setUserPreferences(response.data || []);
+        console.log("Preferências do usuário:", response.data);
         const preferenceIds =
           response.data.map((pref: {typeId: any}) => pref.typeId) || [];
         setUserPreferences(preferenceIds);
@@ -157,15 +166,33 @@ function Home() {
         ] = `Bearer ${token}`;
 
         if (userPreferences.length > 0) {
-          // Deve buscar as preferencias do usuário com parametros na URL que permitem filtra pelo typeId no endpoint /all se o user não tiver preferencias abre o modal
           const response = await activities_api.get(
             "/all?typeId=" + userPreferences.join(","),
           );
           setRecommendedActivities(response.data);
+
+          const grouped: ActivitiesByCategory = {};
+
+          response.data.forEach((activity: Activity) => {
+            const categoryId = activity.type.id;
+            const categoryName = activity.type.name;
+
+            if (!grouped[categoryId]) {
+              grouped[categoryId] = {
+                name: categoryName,
+                activities: [],
+              };
+            }
+
+            grouped[categoryId].activities.push(activity);
+          });
+
+          setActivitiesByCategory(grouped);
         }
 
         const response = await activities_api.get("/all");
         setAllActivities(response.data);
+
         setActivities(response.data);
       }
     } catch (error) {
@@ -182,14 +209,11 @@ function Home() {
 
   const handleCategoryPress = (categoryId: string) => {
     if (selectedCategoryId === categoryId) {
-      // Desseleciona a categoria se já estiver selecionada
       setSelectedCategoryId(null);
       setActivities(allActivities);
     } else {
-      // Seleciona a categoria e filtra atividades
       setSelectedCategoryId(categoryId);
 
-      // Filtrar atividades por categoria
       const filtered = allActivities.filter(
         activity => activity.type.id === categoryId,
       );
@@ -273,16 +297,18 @@ function Home() {
                 <Image source={Star} style={styles.star} />
                 <Text style={styles.level}>{user?.level}</Text>
               </View>
-              <Image
-                source={{
-                  uri:
-                    user?.avatar?.replace(
-                      "http://localhost",
-                      "http://10.0.2.2",
-                    ) || "https://github.com/shadcn.png",
-                }}
-                style={styles.profileImage}
-              />
+              <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+                <Image
+                  source={{
+                    uri:
+                      user?.avatar?.replace(
+                        "http://localhost",
+                        "http://10.0.2.2",
+                      ) || "https://github.com/shadcn.png",
+                  }}
+                  style={styles.profileImage}
+                />
+              </TouchableOpacity>
             </View>
           </SafeAreaView>
         </View>
@@ -290,13 +316,16 @@ function Home() {
         <CategoryHeader
           title={
             activityTypes.find(t => t.id === selectedCategoryId)?.name ||
-            "CATEGORIA"
+            "CATEGORIAS"
           }
           onBackPress={handleBackPress}
         />
       )}
 
-      <ScrollView style={styles.content} nestedScrollEnabled={true}>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{paddingBottom: 20}}>
         {!selectedCategoryId ? (
           <>
             <ActivitySection
@@ -330,8 +359,9 @@ function Home() {
                   />
                 )}
                 ListEmptyComponent={<Text>Nenhuma atividade encontrada</Text>}
-                scrollEnabled={true}
-                nestedScrollEnabled={false}
+                scrollEnabled={false}
+                nestedScrollEnabled={true}
+                style={{height: "auto"}}
               />
             </ActivitySection>
 
@@ -356,9 +386,7 @@ function Home() {
             <ActivitySection
               type="viewMore"
               title="SUAS ATIVIDADES"
-              onPress={() => {
-                navigateToAllActivities();
-              }}>
+              onPress={navigateToAllActivities}>
               <FlatList
                 data={userActivities}
                 keyExtractor={item => item.id}
@@ -388,41 +416,8 @@ function Home() {
                 ListEmptyComponent={
                   <Text>Você não tem atividades nesta categoria</Text>
                 }
-                scrollEnabled={true}
-                nestedScrollEnabled={false}
-              />
-            </ActivitySection>
-
-            <ActivitySection type="dropdown" title="ATIVIDADES DA COMUNIDADE">
-              <FlatList
-                data={communityActivities}
-                keyExtractor={item => item.id}
-                renderItem={({item}) => (
-                  <ActivityCard
-                    title={item.title}
-                    date={`${new Date(item.scheduledDate).toLocaleDateString(
-                      "pt-BR",
-                    )} ${new Date(item.scheduledDate).toLocaleTimeString(
-                      "pt-BR",
-                      {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: false,
-                      },
-                    )}`}
-                    participants={item.participantCount}
-                    imageSource={{
-                      uri: item.image?.replace(
-                        "http://localhost",
-                        "http://10.0.2.2",
-                      ),
-                    }}
-                    isPrivate={item.private}
-                  />
-                )}
-                ListEmptyComponent={<Text>Nenhuma atividade encontrada</Text>}
-                scrollEnabled={true}
-                nestedScrollEnabled={false}
+                scrollEnabled={false}
+                nestedScrollEnabled={true}
               />
             </ActivitySection>
           </>
@@ -435,4 +430,5 @@ function Home() {
     </View>
   );
 }
+
 export default Home;
