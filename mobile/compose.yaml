@@ -45,10 +45,8 @@ services:
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
       - PERSISTENCE=1
-      - LOCALSTACK_PERSISTENCE=1
-      - DATA_DIR=/var/lib/localstack/data
     volumes:
-      - ./localstack:/var/lib/localstack/data
+      - ./localstack:/var/lib/localstack
     networks:
       - bootcamp-network
     deploy:
