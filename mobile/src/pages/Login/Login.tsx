@@ -6,13 +6,13 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Alert,
   ActivityIndicator,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
   Image,
 } from "react-native";
+import Toast from "react-native-toast-message";
 //@ts-ignore
 import Logo from "../../assets/images/fitmeet.png";
 import {Eye, EyeSlash} from "phosphor-react-native";
@@ -41,20 +41,36 @@ function App() {
 
   const handleLogin = async () => {
     if (!email) {
-      Alert.alert("Erro", "E-mail é obrigatório.");
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "E-mail é obrigatório.",
+      });
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert("Erro", "Formato de e-mail inválido.");
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Formato de e-mail inválido.",
+      });
       return;
     }
     if (!password) {
-      Alert.alert("Erro", "Senha é obrigatória.");
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Senha é obrigatória.",
+      });
       return;
     }
     if (password.length < 6) {
-      Alert.alert("Erro", "A senha deve ter no mínimo 6 caracteres.");
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "A senha deve ter no mínimo 6 caracteres.",
+      });
       return;
     }
 
@@ -62,13 +78,18 @@ function App() {
     try {
       login(email, password);
 
-      Alert.alert("Sucesso", "Login realizado com sucesso!");
+      Toast.show({
+        type: "success",
+        text1: "Sucesso",
+        text2: "Login realizado com sucesso!",
+      });
       navigateToHome();
     } catch (error: any) {
-      Alert.alert(
-        "Erro no Login",
-        error?.message || "Não foi possível fazer login.",
-      );
+      Toast.show({
+        type: "error",
+        text1: "Erro no Login",
+        text2: error?.message || "Não foi possível fazer login.",
+      });
       console.error(error);
     } finally {
       setIsLoading(false);

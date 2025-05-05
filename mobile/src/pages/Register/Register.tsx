@@ -1,55 +1,96 @@
-import React, {useState} from 'react';
+import React, {useState} from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   SafeAreaView,
-  Alert,
   ActivityIndicator,
-} from 'react-native';
-import {styles} from './style';
-import {useTypedNavigation} from '../../hooks/useTypedNavigation';
-import {CaretLeft} from 'phosphor-react-native';
+} from "react-native";
+import Toast from "react-native-toast-message";
+import {styles} from "./style";
+import {useTypedNavigation} from "../../hooks/useTypedNavigation";
+import {CaretLeft} from "phosphor-react-native";
+import axios from "axios";
+import {auth_api} from "../../services/api";
 
 export function Register() {
-  const [name, setName] = useState('');
-  const [cpf, setCpf] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useTypedNavigation();
 
   const handleRegister = async () => {
     if (!name.trim()) {
-      Alert.alert('Erro', 'Nome é obrigatório');
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Nome é obrigatório",
+      });
       return;
     }
     if (!cpf.trim()) {
-      Alert.alert('Erro', 'CPF é obrigatório');
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "CPF é obrigatório",
+      });
       return;
     }
     if (!email.trim()) {
-      Alert.alert('Erro', 'E-mail é obrigatório');
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "E-mail é obrigatório",
+      });
       return;
     }
     if (!password.trim()) {
-      Alert.alert('Erro', 'Senha é obrigatória');
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Senha é obrigatória",
+      });
       return;
     }
 
     setIsLoading(true);
     try {
-      // Implementar chamada à API de registro
-      setTimeout(() => {
-        Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
-        navigation.navigate({
-          name: 'Login',
-          params: {name: 'Login', isError: false},
-        });
-      }, 2000);
-    } catch (error) {
-      Alert.alert('Erro', 'Não foi possível realizar o cadastro');
+      const userData = {
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        cpf: cpf.trim().replace(/[^\d]/g, ""),
+        password: password,
+      };
+      console.log("User data:", userData);
+      await auth_api.post(`/register`, userData);
+
+      Toast.show({
+        type: "success",
+        text1: "Sucesso",
+        text2: "Cadastro realizado com sucesso!",
+      });
+
+      navigation.navigate({
+        name: "Login",
+        params: {
+          name: "Login",
+          isError: false,
+        },
+      });
+    } catch (error: any) {
+      console.error("Registration error:", error);
+
+      const errorMessage =
+        error.response?.data?.message || "Não foi possível realizar o cadastro";
+
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: errorMessage,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -143,8 +184,8 @@ export function Register() {
             <TouchableOpacity
               onPress={() =>
                 navigation.navigate({
-                  name: 'Login',
-                  params: {name: 'Login', isError: false},
+                  name: "Login",
+                  params: {name: "Login", isError: false},
                 })
               }
               disabled={isLoading}>
