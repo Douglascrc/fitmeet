@@ -22,6 +22,7 @@ import {ActivityType, CategorySection} from "../../components/CategorySection";
 import {CategoryHeader} from "../../components/CategoryHeader";
 import {PreferencesModal} from "../../components/ModalPreferences";
 import {useTypedNavigation} from "../../hooks/useTypedNavigation";
+import {Activity} from "../../types/Activity";
 
 type ActivitiesByCategory = {
   [categoryId: string]: {
@@ -41,45 +42,18 @@ export type User = {
   cpf: string;
 };
 
-export type Activity = {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  scheduledDate: string;
-  participantCount: number;
-  private: boolean;
-  type: ActivityType;
-  creator: {
-    id: string;
-    name: string;
-    avatar: string;
-  };
-  userSubscriptionStatus: string;
-};
-
 function Home() {
   const [activityTypes, setActivityTypes] = useState<ActivityType[]>([]);
   const {token} = useAppContext();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [allActivities, setAllActivities] = useState<Activity[]>([]);
   const [showAllActivities, setShowAllActivities] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
-    null,
-  );
-  const [activitiesByCategory, setActivitiesByCategory] =
-    useState<ActivitiesByCategory>({});
+
   const [user, setUser] = useState<User>();
   const [isLoading, setIsLoading] = useState(true);
   const insets = useSafeAreaInsets();
   const [userActivities, setUserActivities] = useState<Activity[]>([]);
-  const [communityActivities, setCommunityActivities] = useState<Activity[]>(
-    [],
-  );
   const [userPreferences, setUserPreferences] = useState<string[]>([]);
-  const [recommendedActivities, setRecommendedActivities] = useState<
-    Activity[]
-  >([]);
 
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
   const navigation = useTypedNavigation();
@@ -165,31 +139,6 @@ function Home() {
           "Authorization"
         ] = `Bearer ${token}`;
 
-        if (userPreferences.length > 0) {
-          const response = await activities_api.get(
-            "/all?typeId=" + userPreferences.join(","),
-          );
-          setRecommendedActivities(response.data);
-
-          const grouped: ActivitiesByCategory = {};
-
-          response.data.forEach((activity: Activity) => {
-            const categoryId = activity.type.id;
-            const categoryName = activity.type.name;
-
-            if (!grouped[categoryId]) {
-              grouped[categoryId] = {
-                name: categoryName,
-                activities: [],
-              };
-            }
-
-            grouped[categoryId].activities.push(activity);
-          });
-
-          setActivitiesByCategory(grouped);
-        }
-
         const response = await activities_api.get("/all");
         setAllActivities(response.data);
 
@@ -205,39 +154,16 @@ function Home() {
     fetchActivityTypes();
     fetchActivities();
     fetchUser();
-  }, []);
+  }, [token]);
 
   const handleCategoryPress = (categoryId: string) => {
-    if (selectedCategoryId === categoryId) {
-      setSelectedCategoryId(null);
-      setActivities(allActivities);
-    } else {
-      setSelectedCategoryId(categoryId);
-
-      const filtered = allActivities.filter(
-        activity => activity.type.id === categoryId,
-      );
-      setActivities(filtered);
-
-      const userActs = filtered.filter(
-        activity =>
-          activity.creator?.id === user?.id ||
-          activity.userSubscriptionStatus === "SUBSCRIBED" ||
-          activity.userSubscriptionStatus === "CONFIRMED",
-      );
-
-      const communityActs = filtered.filter(
-        activity => !userActs.some(ua => ua.id === activity.id),
-      );
-
-      setUserActivities(userActs);
-      setCommunityActivities(communityActs);
+    const category = activityTypes.find(type => type.id === categoryId);
+    if (category) {
+      navigation.navigate("Activities", {
+        categoryId: categoryId,
+        categoryName: category.name,
+      });
     }
-  };
-
-  const handleBackPress = () => {
-    setSelectedCategoryId(null);
-    setActivities(allActivities);
   };
 
   const navigateToAllActivities = () => {
@@ -284,147 +210,97 @@ function Home() {
         onSavePreferences={savePreferences}
       />
 
-      {!selectedCategoryId ? (
-        <View style={styles.header}>
-          <SafeAreaView
-            style={[styles.sectionHeader, {paddingTop: insets.top}]}>
-            <View>
-              <Text style={styles.greeting}>Olá, Seja Bem Vindo</Text>
-              <Text style={styles.userName}>{user?.name}!</Text>
+      <View style={styles.header}>
+        <SafeAreaView style={[styles.sectionHeader, {paddingTop: insets.top}]}>
+          <View>
+            <Text style={styles.greeting}>Olá, Seja Bem Vindo</Text>
+            <Text style={styles.userName}>{user?.name}!</Text>
+          </View>
+          <View style={styles.profileContainer}>
+            <View style={styles.levelContainer}>
+              <Image source={Star} style={styles.star} />
+              <Text style={styles.level}>{user?.level}</Text>
             </View>
-            <View style={styles.profileContainer}>
-              <View style={styles.levelContainer}>
-                <Image source={Star} style={styles.star} />
-                <Text style={styles.level}>{user?.level}</Text>
-              </View>
-              <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-                <Image
-                  source={{
-                    uri:
-                      user?.avatar?.replace(
-                        "http://localhost",
-                        "http://10.0.2.2",
-                      ) || "https://github.com/shadcn.png",
-                  }}
-                  style={styles.profileImage}
-                />
-              </TouchableOpacity>
-            </View>
-          </SafeAreaView>
-        </View>
-      ) : (
-        <CategoryHeader
-          title={
-            activityTypes.find(t => t.id === selectedCategoryId)?.name ||
-            "CATEGORIAS"
-          }
-          onBackPress={handleBackPress}
-        />
-      )}
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate({
+                  name: "Profile",
+                  params: {name: user?.name || "", isError: false},
+                })
+              }>
+              <Image
+                source={{
+                  uri:
+                    user?.avatar?.replace(
+                      "http://localhost",
+                      "http://10.0.2.2",
+                    ) || "https://github.com/shadcn.png",
+                }}
+                style={styles.profileImage}
+              />
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </View>
 
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{paddingBottom: 20}}>
-        {!selectedCategoryId ? (
-          <>
-            <ActivitySection
-              type="viewMore"
-              title="Suas Recomendações"
-              onPress={navigateToAllActivities}>
-              <FlatList
-                data={showAllActivities ? activities : activities.slice(0, 2)}
-                keyExtractor={item => item.id}
-                renderItem={({item}) => (
-                  <ActivityCard
-                    title={item.title}
-                    date={`${new Date(item.scheduledDate).toLocaleDateString(
-                      "pt-BR",
-                    )} ${new Date(item.scheduledDate).toLocaleTimeString(
-                      "pt-BR",
-                      {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: false,
-                      },
-                    )}`}
-                    participants={item.participantCount}
-                    imageSource={{
-                      uri: item.image?.replace(
-                        "http://localhost",
-                        "http://10.0.2.2",
-                      ),
-                    }}
-                    isPrivate={item.private}
-                  />
-                )}
-                ListEmptyComponent={<Text>Nenhuma atividade encontrada</Text>}
-                scrollEnabled={false}
-                nestedScrollEnabled={true}
-                style={{height: "auto"}}
-              />
-            </ActivitySection>
-
-            <CategorySection
-              title="Categorias"
-              categories={activityTypes}
-              isLoading={activityTypes.length === 0}
-              onCategoryPress={handleCategoryPress}
-              selectedCategoryId={selectedCategoryId}
+        <>
+          <ActivitySection
+            type="viewMore"
+            title="Suas Recomendações"
+            onPress={navigateToAllActivities}>
+            <FlatList
+              data={showAllActivities ? activities : activities.slice(0, 2)}
+              keyExtractor={item => item.id}
+              renderItem={({item}) => (
+                <ActivityCard
+                  title={item.title}
+                  date={`${new Date(item.scheduledDate).toLocaleDateString(
+                    "pt-BR",
+                  )} ${new Date(item.scheduledDate).toLocaleTimeString(
+                    "pt-BR",
+                    {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false,
+                    },
+                  )}`}
+                  participants={item.participantCount}
+                  imageSource={{
+                    uri: item.image?.replace(
+                      "http://localhost",
+                      "http://10.0.2.2",
+                    ),
+                  }}
+                  isPrivate={item.private}
+                  isEditable={item.creator?.id === user?.id}
+                  activity={item}
+                />
+              )}
+              ListEmptyComponent={<Text>Nenhuma atividade encontrada</Text>}
+              scrollEnabled={false}
+              nestedScrollEnabled={true}
+              style={{height: "auto"}}
             />
-          </>
-        ) : (
-          <>
-            <CategorySection
-              title="CATEGORIAS"
-              categories={activityTypes}
-              isLoading={activityTypes.length === 0}
-              onCategoryPress={handleCategoryPress}
-              selectedCategoryId={selectedCategoryId}
-            />
+          </ActivitySection>
 
-            <ActivitySection
-              type="viewMore"
-              title="SUAS ATIVIDADES"
-              onPress={navigateToAllActivities}>
-              <FlatList
-                data={userActivities}
-                keyExtractor={item => item.id}
-                renderItem={({item}) => (
-                  <ActivityCard
-                    title={item.title}
-                    date={`${new Date(item.scheduledDate).toLocaleDateString(
-                      "pt-BR",
-                    )} ${new Date(item.scheduledDate).toLocaleTimeString(
-                      "pt-BR",
-                      {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: false,
-                      },
-                    )}`}
-                    participants={item.participantCount}
-                    imageSource={{
-                      uri: item.image?.replace(
-                        "http://localhost",
-                        "http://10.0.2.2",
-                      ),
-                    }}
-                    isPrivate={item.private}
-                  />
-                )}
-                ListEmptyComponent={
-                  <Text>Você não tem atividades nesta categoria</Text>
-                }
-                scrollEnabled={false}
-                nestedScrollEnabled={true}
-              />
-            </ActivitySection>
-          </>
-        )}
+          <CategorySection
+            title="Categorias"
+            categories={activityTypes}
+            isLoading={activityTypes.length === 0}
+            onCategoryPress={handleCategoryPress}
+          />
+        </>
       </ScrollView>
 
-      <TouchableOpacity style={styles.fab}>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() =>
+          navigation.navigate("ActivityForm", {isEditMode: false})
+        }>
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
     </View>
