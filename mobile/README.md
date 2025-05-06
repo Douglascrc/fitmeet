@@ -1,8 +1,6 @@
-# BootCamp Connect
-
 ## Visão Geral
 
-BootCamp Connect é uma aplicação móvel desenvolvida em React Native que permite aos usuários criar, participar e gerenciar atividades esportivas. O aplicativo oferece funcionalidades como autenticação, criação e edição de atividades, visualização de perfil de usuário e seleção de preferências.
+Uma aplicação móvel desenvolvida em React Native que permite aos usuários criar, participar e gerenciar atividades esportivas. O aplicativo oferece funcionalidades como autenticação, criação e edição de atividades, visualização de perfil de usuário e seleção de preferências.
 
 <div align="center">
   <img src="src/assets/images/app.jpg" alt="BootCamp Connect" width="300"/>
