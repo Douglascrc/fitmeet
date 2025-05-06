@@ -9,7 +9,7 @@ import {
   updateUser,
 } from "../services/user-service";
 import validateRequestBody from "../middlewares/request-validator";
-import updateValidation from "../../validations/update-validation";
+import updateValidation from "../validations/update-validation";
 import upload from "../multer/multer";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

@@ -12,6 +12,8 @@ RUN npx prisma generate
 
 RUN npm run build
 
+RUN cp src/swagger.yaml dist/swagger.yaml
+
 EXPOSE 3000
 
 CMD [ "npm", "start" ]

@@ -8,7 +8,7 @@
   "license": "ISC",
   "scripts": {
     "dev": "nodemon src/index.ts",
-    "start": "prisma migrate dev && node dist/index.ts",
+    "start": "prisma migrate deploy && node dist/index.js",
     "build": "tsc",
     "test": "jest --runInBand --verbose",
     "test:watch": "jest --watchAll --runInBand --verbose"
