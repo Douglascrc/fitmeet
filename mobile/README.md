@@ -1,97 +1,189 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# BootCamp Connect
 
-# Getting Started
+## Visão Geral
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+BootCamp Connect é uma aplicação móvel desenvolvida em React Native que permite aos usuários criar, participar e gerenciar atividades esportivas. O aplicativo oferece funcionalidades como autenticação, criação e edição de atividades, visualização de perfil de usuário e seleção de preferências.
 
-## Step 1: Start Metro
+![BootCamp Connect](src/assets/images/app.jpg)
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Índice
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- [Instalação](#instalação)
+- [Configuração do Ambiente](#configuração-do-ambiente)
+- [Executando o Aplicativo](#executando-o-aplicativo)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Funcionalidades Principais](#funcionalidades-principais)
+- [Tecnologias Utilizadas](#tecnologias-utilizadas)
+- [API e Integração com Backend](#api-e-integração-com-backend)
+- [Ambiente de Desenvolvimento Local](#ambiente-de-desenvolvimento-local)
 
-```sh
-# Using npm
-npm start
+## Instalação
 
-# OR using Yarn
-yarn start
+### Pré-requisitos
+
+- Node.js (versão 18 ou superior - veja `package.json`)
+- JDK 11 ou superior
+- Android Studio (para desenvolvimento Android)
+- XCode (para desenvolvimento iOS)
+- CocoaPods (para iOS - veja `Gemfile` para versões compatíveis)
+- Ruby (versão >= 2.6.10 - veja `Gemfile`)
+- Bundler (para gerenciar gems Ruby)
+
+### Configuração do Ambiente
+
+1.  **Clone o repositório:**
+
+    ```bash
+    git clone <url-do-repositório>
+    cd Douglas-da-Concei-o-Ribeiro-Campos/mobile
+    ```
+
+2.  **Instale as dependências do Node.js:**
+
+    ```bash
+    npm install
+    # ou
+    yarn install
+    ```
+
+3.  **Execute o projeto:**
+    Execute este comando sempre para rodar o projeto e certifique se que tem um emulador android.
+
+    ```bash
+    npm run android
+    ```
+
+4.  **Configure as Variáveis de Ambiente (Android):**
+    - Crie um arquivo `local.properties` na pasta `android/`.
+    - Adicione sua chave da API Google Maps:
+      ```properties
+      # filepath: android/local.properties
+      MAPS_API_KEY=SUA_CHAVE_API_GOOGLE_MAPS_AQUI
+      ```
+      _Observação: O arquivo `android/app/build.gradle` está configurado para ler esta chave._
+
+## Executando o Aplicativo
+
+1.  **Inicie o servidor Metro:**
+    Abra um terminal na raiz do projeto (`mobile/`) e execute:
+
+    ```bash
+    npm start
+    # ou
+    yarn start
+    ```
+
+2.  **Execute o aplicativo:**
+    Abra _outro_ terminal na raiz do projeto (`mobile/`) e execute:
+
+    **Para Android:**
+
+    ```bash
+    npm run android
+    # ou
+    yarn android
+    ```
+
+    **Para iOS:**
+
+    ```bash
+    npm run ios
+    # ou
+    yarn ios
+    ```
+
+## Estrutura do Projeto
+
+```
+mobile/
+├── android/           # Código e configurações específicas para Android
+├── ios/               # Código e configurações específicas para iOS
+├── src/
+│   ├── assets/        # Imagens, fontes e outros recursos estáticos
+│   ├── components/    # Componentes React Native reutilizáveis (ActivityCard, etc.)
+│   ├── context/       # Context API para gerenciamento de estado global (AppState.tsx)
+│   ├── hooks/         # Hooks personalizados (useAppContext, useTypedNavigation)
+│   ├── pages/         # Telas da aplicação (Home, Login, Profile, ActivityForm, etc.)
+│   └── services/      # Configuração e instâncias do Axios para comunicação com a API (api.ts)
+├── compose.yaml       # Configuração Docker Compose para ambiente local (LocalStack)
+├── localstack/        # Arquivos de configuração/inicialização para LocalStack
+├── App.tsx            # Componente raiz que configura rotas e providers
+├── index.js           # Ponto de entrada da aplicação React Native
+└── README.md          # Este arquivo
 ```
 
-## Step 2: Build and run your app
+## Funcionalidades Principais
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+- **Autenticação:** Cadastro de usuários com armazenamento seguro de credenciais (React Native Keychain).
+- **Gerenciamento de Atividades:**
+  - Criação e Edição de atividades.
+  - Upload de imagens (React Native Image Picker).
+  - Seleção de localização no mapa (React Native Maps).
+  - Definição de privacidade e categoria.
+- **Feed de Atividades:** Visualização de atividades na tela principal, incluindo recomendações e atividades por categoria.
+- **Perfil do Usuário:** Exibição de informações do usuário, nível, XP, conquistas e atividades criadas/participadas.
+- **Preferências:** Modal para seleção de categorias de atividades preferidas.
 
-### Android
+## Tecnologias Utilizadas
 
-```sh
-# Using npm
-npm run android
+- **React Native:** Framework principal para desenvolvimento mobile multiplataforma.
+- **TypeScript:** Superset do JavaScript para tipagem estática.
+- **React Navigation:** Gerenciamento de navegação entre telas.
+- **Axios:** Cliente HTTP para requisições à API backend.
+- **React Native Maps:** Integração com mapas nativos (Google Maps).
+- **React Native Image Picker:** Seleção de imagens da galeria ou câmera.
+- **React Native Keychain:** Armazenamento seguro de credenciais.
+- **React Native Safe Area Context:** Gerenciamento de áreas seguras da tela.
+- **React Native Toast Message:** Exibição de notificações toast.
+- **Phosphor Icons:** Biblioteca de ícones.
+- **Context API:** Para gerenciamento de estado global simples.
 
-# OR using Yarn
-yarn android
+_(Veja [`package.json`](package.json) para a lista completa de dependências)_
+
+## API e Integração com Backend
+
+O aplicativo se comunica com uma API backend para buscar e enviar dados. As instâncias do Axios estão configuradas em [`src/services/api.ts`](src/services/api.ts).
+
+**Exemplo de Requisição (Criação de Atividade):**
+
+```typescript
+// Em src/pages/ActivityForm/ActivityForm.tsx
+
+const formData = new FormData();
+formData.append("title", title);
+formData.append("description", description);
+formData.append("typeId", selectedCategories[0]);
+formData.append(
+  "address",
+  JSON.stringify({
+    latitude: location.latitude,
+    longitude: location.longitude,
+  }),
+);
+formData.append("scheduledDate", date.toISOString());
+formData.append("private", isPrivate.toString());
+if (image) {
+  formData.append("image", {
+    uri: image.uri,
+    type: image.type || "image/jpeg",
+    name: image.name || "photo.jpg",
+  });
+}
+
+await activities_api.post("/new", formData, {
+  headers: {
+    "Content-Type": "multipart/form-data",
+    Accept: "application/json",
+  },
+});
 ```
 
-### iOS
+## Ambiente de Desenvolvimento Local
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+O projeto utiliza Docker Compose ([`compose.yaml`](compose.yaml)) para configurar um ambiente de desenvolvimento local, incluindo o LocalStack para simular serviços AWS (como S3 para armazenamento de imagens).
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+Para iniciar o ambiente local:
 
-```sh
-bundle install
+```bash
+docker-compose up -d
 ```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
