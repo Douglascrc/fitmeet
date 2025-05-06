@@ -8,6 +8,7 @@ import Profile from "../pages/Profile/Profile";
 import ActivityForm from "../pages/ActivityForm/ActivityForm";
 import ActivityDetails from "../components/ActivityDetails";
 import {Activity} from "../types/Activity";
+import EditProfile from "../pages/Profile/EditProfile/EditProfile";
 
 export type MainStackParamList = {
   Login: {name: string; isError: boolean};
@@ -17,6 +18,7 @@ export type MainStackParamList = {
   Profile: {name: string; isError: boolean};
   ActivityForm: {activityId?: string; isEditMode?: boolean};
   ActivityDescription: {activity: Activity};
+  EditProfile: {name: string; userId?: string};
 };
 
 const MainStack = createStackNavigator();
@@ -30,6 +32,7 @@ function MainStackScreen() {
         <MainStack.Screen name="Register" component={Register} />
         <MainStack.Screen name="Activities" component={ActivityCategory} />
         <MainStack.Screen name="Profile" component={Profile} />
+        <MainStack.Screen name="EditProfile" component={EditProfile} />
         <MainStack.Screen
           name="ActivityForm"
           component={ActivityForm}

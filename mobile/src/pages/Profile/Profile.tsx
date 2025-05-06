@@ -14,16 +14,18 @@ import useAppContext from "../../hooks/useContext";
 import {activities_api, user_api} from "../../services/api";
 import {ActivityCard} from "../../components/ActivityCard";
 import {styles} from "./style";
-import {Activity, User} from "../Home/Home";
+import {User} from "../Home/Home";
 import {useTypedNavigation} from "../../hooks/useTypedNavigation";
 import {CaretLeft, Medal, PencilSimple, SignOut} from "phosphor-react-native";
 import {ActivitySection} from "../../components/ActivitySection";
+import {Activity} from "../../types/Activity";
+import Toast from "react-native-toast-message";
 
 const {width} = Dimensions.get("window");
 const CARD_WIDTH = Math.min(width - 26, 403);
 
 export function Profile() {
-  const {token} = useAppContext();
+  const {token, logout} = useAppContext();
   const [user, setUser] = useState<User | null>(null);
   const [userActivities, setUserActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -154,6 +156,22 @@ export function Profile() {
     setActiveSlide(currentIndex);
   };
 
+  const handleLogout = () => {
+    Toast.show({
+      type: "info",
+      text1: "Saindo...",
+      text2: "Você será desconectado em breve.",
+      visibilityTime: 1500,
+      onHide: () => {
+        logout();
+        navigation.navigate({
+          name: "Login",
+          params: {name: "Login", isError: false},
+        });
+      },
+    });
+  };
+
   if (isLoading) {
     return (
       <View style={styles.container}>
@@ -183,10 +201,17 @@ export function Profile() {
           <Text style={styles.headerTitle}>PERFIL</Text>
 
           <View style={styles.headerButtons}>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() =>
+                navigation.navigate({
+                  name: "EditProfile",
+                  params: {name: "EditProfile", userId: user?.id},
+                })
+              }>
               <PencilSimple size={32} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity style={styles.iconButton} onPress={handleLogout}>
               <SignOut size={32} />
             </TouchableOpacity>
           </View>
@@ -250,6 +275,8 @@ export function Profile() {
                     ),
                   }}
                   isPrivate={item.private}
+                  isEditable={item.creator?.id === user?.id}
+                  activity={item}
                 />
               ))
             ) : (
@@ -281,6 +308,8 @@ export function Profile() {
                   ),
                 }}
                 isPrivate={item.private}
+                isEditable={item.creator?.id === user?.id}
+                activity={item}
               />
             ))}
           </ActivitySection>
