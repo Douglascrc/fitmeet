@@ -5,13 +5,18 @@ import {NavigationContainer} from "@react-navigation/native";
 import {Register} from "../pages/Register/Register";
 import ActivityCategory from "../pages/ActivityCategory/ActivityCategory";
 import Profile from "../pages/Profile/Profile";
+import ActivityForm from "../pages/ActivityForm/ActivityForm";
+import ActivityDetails from "../components/ActivityDetails";
+import {Activity} from "../types/Activity";
 
 export type MainStackParamList = {
   Login: {name: string; isError: boolean};
   Register: {name: string; isError: boolean};
   Home: {name: string; isError: boolean};
   Activities: {categoryId: string; categoryName: string};
-  Profile: undefined;
+  Profile: {name: string; isError: boolean};
+  ActivityForm: {activityId?: string; isEditMode?: boolean};
+  ActivityDescription: {activity: Activity};
 };
 
 const MainStack = createStackNavigator();
@@ -25,6 +30,16 @@ function MainStackScreen() {
         <MainStack.Screen name="Register" component={Register} />
         <MainStack.Screen name="Activities" component={ActivityCategory} />
         <MainStack.Screen name="Profile" component={Profile} />
+        <MainStack.Screen
+          name="ActivityForm"
+          component={ActivityForm}
+          options={{headerShown: false}}
+        />
+        <MainStack.Screen
+          name="ActivityDescription"
+          component={ActivityDetails}
+          options={{headerShown: false}}
+        />
       </MainStack.Group>
     </MainStack.Navigator>
   );
