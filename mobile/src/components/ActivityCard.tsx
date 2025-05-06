@@ -1,5 +1,5 @@
 import React from "react";
-import {View, Text, Image} from "react-native";
+import {View, Text, Image, TouchableOpacity} from "react-native";
 import {styles} from "../pages/Home/style";
 
 // @ts-ignore
@@ -8,24 +8,46 @@ import CalendarIcon from "../assets/images/calendar.png";
 import GroupIcon from "../assets/images/group.png";
 // @ts-ignore
 import PrivateIcon from "../assets/images/private.png";
+import {useTypedNavigation} from "../hooks/useTypedNavigation";
+import {Activity} from "../types/Activity";
 
 interface ActivityCardProps {
+  id?: string;
   title: string;
   date: string;
   participants: number;
   imageSource: any;
   isPrivate?: boolean;
+  isEditable: boolean;
+  onPress?: (id: string) => void;
+  activity?: Activity;
 }
 
 export function ActivityCard({
+  id,
   title,
   date,
   participants,
   imageSource,
   isPrivate = false,
+  isEditable = false,
+  onPress,
+  activity,
 }: ActivityCardProps) {
+  const navigation = useTypedNavigation();
+
+  const handlePress = () => {
+    if (activity) {
+      navigation.navigate("ActivityDescription", {activity: activity});
+    } else if (id && onPress) {
+      onPress(id);
+    }
+  };
   return (
-    <View style={styles.activityCard}>
+    <TouchableOpacity
+      style={styles.activityCard}
+      onPress={handlePress}
+      disabled={!activity && (!onPress || !id)}>
       <View style={styles.imageContainer}>
         <Image source={imageSource} style={styles.activityImage} />
         {isPrivate && (
@@ -46,6 +68,6 @@ export function ActivityCard({
           <Text style={styles.participants}>{participants}</Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
