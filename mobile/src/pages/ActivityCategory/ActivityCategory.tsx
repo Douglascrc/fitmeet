@@ -6,9 +6,9 @@ import {CategoryHeader} from "../../components/CategoryHeader";
 import {activities_api} from "../../services/api";
 import {useRoute, useNavigation} from "@react-navigation/native";
 import useAppContext from "../../hooks/useContext";
-import {Activity} from "../Home/Home";
 import {ActivityType, CategorySection} from "../../components/CategorySection";
 import {ActivitySection} from "../../components/ActivitySection";
+import {Activity} from "../../types/Activity";
 
 type RouteParams = {
   categoryId: string;
@@ -19,9 +19,7 @@ export default function Activities() {
   const route = useRoute();
   const navigation = useNavigation();
   const {categoryId, categoryName} = route.params as RouteParams;
-
-  const {token} = useAppContext();
-
+  const {user} = useAppContext();
   const [activityTypes, setActivityTypes] = useState<ActivityType[]>([]);
   const [userActivities, setUserActivities] = useState<Activity[]>([]);
   const [communityActivities, setCommunityActivities] = useState<Activity[]>(
@@ -50,54 +48,29 @@ export default function Activities() {
   const fetchActivities = async (categoryId: string) => {
     setIsLoading(true);
     try {
-      if (token) {
-        activities_api.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${token}`;
-      } else {
-        console.log("Token não disponível, autenticação pode falhar");
-      }
-
       const userActivitiesResponse = await activities_api.get(
         "user/creator/all",
-      );
-      console.log(
-        "Resposta do /user/creator/all:",
-        userActivitiesResponse.data,
       );
 
       let filteredUserActivities = Array.isArray(userActivitiesResponse?.data)
         ? userActivitiesResponse.data
         : [];
 
-      console.log(
-        "Array de atividades do usuário extraído:",
-        filteredUserActivities.length,
-      );
-
       if (categoryId !== "all" && filteredUserActivities.length > 0) {
-        console.log(
-          "Primeiro item antes do filtro:",
-          JSON.stringify(filteredUserActivities[0].type),
-        );
+        if (activityTypes.length === 0) {
+          console.warn("activityTypes ainda não carregado.");
+        }
 
         filteredUserActivities = filteredUserActivities.filter(
           (activity: Activity) => {
-            if (typeof activity.type === "string") {
-              const activityTypeObj = activityTypes.find(
-                t => t.name === String(activity.type),
-              );
-              return activityTypeObj?.id === categoryId;
-            }
-
-            return activity.type?.id === categoryId;
+            const activityTypeObj = activityTypes.find(
+              t => t.name === activity.type,
+            );
+            return activityTypeObj?.id === categoryId;
           },
         );
-
-        console.log("Atividades filtradas:", filteredUserActivities.length);
       }
 
-      console.log("Chamando endpoint /all");
       const allActivitiesResponse = await activities_api.get("/all");
       const allActivities = Array.isArray(allActivitiesResponse?.data)
         ? allActivitiesResponse.data
@@ -182,6 +155,8 @@ export default function Activities() {
                       ),
                     }}
                     isPrivate={item.private}
+                    isEditable={item.creator?.id === user?.id}
+                    activity={item}
                   />
                 )}
                 ListEmptyComponent={
@@ -219,6 +194,8 @@ export default function Activities() {
                       ),
                     }}
                     isPrivate={item.private}
+                    isEditable={item.creator?.id === user?.id}
+                    activity={item}
                   />
                 )}
                 ListEmptyComponent={
