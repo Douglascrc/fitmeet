@@ -12,7 +12,7 @@ FITMEET é uma aplicação desenvolvida durante o Bootcamp da SysMap, focada em 
 - TypeScript
 - Prisma ORM com PostgreSQL
 - JWT para autenticação
-- AWS S3 (LocalStack para desenvolvimento)
+- Blob Storage
 - Swagger para documentação
 - Jest & Supertest para testes
 
