@@ -4,7 +4,7 @@ import cors from "cors";
 import userController from "./controllers/user-controller";
 import authController from "./auth/auth-controller";
 import activityController from "./controllers/activity-controller";
-import { createBucket } from "./services/s3-service";
+import { createContainer } from "./services/blob-service";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 import path from "path";
@@ -22,7 +22,7 @@ server.use((req, res, next) => {
 });
 
 server.use(cors());
-createBucket();
+createContainer();
 userController(server);
 authController(server);
 activityController(server);

@@ -2,7 +2,7 @@ import { randomBytes } from "crypto";
 import * as activityRepository from "../repositories/activity-repository";
 import prisma from "../prisma-orm/prisma-client";
 import activityData from "../types/activity-creation";
-import { uploadImage } from "./s3-service";
+import { uploadImage } from "./blob-service";
 import { addExperience, getPreferences } from "./user-service";
 import { grantAchievement } from "./user-achievements-service";
 

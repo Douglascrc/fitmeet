@@ -12,7 +12,7 @@ import {
   updateUserXP,
 } from "../repositories/user-repository";
 import userData from "../types/user-creation";
-import { uploadImage } from "./s3-service";
+import { uploadImage } from "./blob-service";
 
 export async function getUserById(userId: string) {
   const user = await getUserAuthRepository(userId);
