@@ -13,6 +13,7 @@ import {
 } from "../repositories/user-repository";
 import userData from "../types/user-creation";
 import { uploadImage } from "./blob-service";
+import { trackUserAvatarUpdated } from "./telemetryClient";
 
 export async function getUserById(userId: string) {
   const user = await getUserAuthRepository(userId);
@@ -101,7 +102,7 @@ export async function updateAvatar(avatar: Express.Multer.File, userId: string) 
   const imageUrl = await uploadImage(avatar);
 
   const updatedUser = await updateAvatarById(imageUrl, userId);
-  console.log(imageUrl);
+  trackUserAvatarUpdated(userId);
 
   return {
     avatar: updatedUser.avatar,
