@@ -3,12 +3,6 @@ import jwt from "jsonwebtoken";
 
 const jwtSecret = process.env.JWT_SECRET!;
 
-declare module "express-serve-static-core" {
-  interface Request {
-    userId: string;
-  }
-}
-
 export default function authGuard(request: Request, response: Response, next: NextFunction) {
   const authHeader = request.headers.authorization;
 
