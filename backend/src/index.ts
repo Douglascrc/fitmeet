@@ -1,4 +1,5 @@
 import "dotenv/config";
+import "./services/app-insights";
 import express from "express";
 import cors from "cors";
 import userController from "./controllers/user-controller";
