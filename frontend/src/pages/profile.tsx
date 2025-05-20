@@ -19,7 +19,6 @@ export default function Profile() {
   const [historicActivities, setHistoricActivities] = useState<Activity[]>([]);
 
   const [page, setPage] = useState(1);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [pageSize, setPageSize] = useState(4);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -240,6 +239,16 @@ export default function Profile() {
           <p className="text-center text-gray-500">Nenhuma atividade concluída ainda.</p>
         )}
       </section>
+      <label>
+        Itens por página:
+        <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))}>
+          {[4, 8, 12].map((n) => (
+            <option key={n} value={n}>
+              {n}
+            </option>
+          ))}
+        </select>
+      </label>
     </div>
   );
 }
