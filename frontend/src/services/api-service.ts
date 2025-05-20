@@ -1,13 +1,13 @@
 import axios from "axios";
 
 export const auth_api = axios.create({
-  baseURL: "http://localhost:3000/auth",
+  baseURL: "https://fitmeet.vercel.app",
 });
 
 export const user_api = axios.create({
-  baseURL: "http://localhost:3000/user",
+  baseURL: "https://fitmeet.vercel.app",
 });
 
 export const activities_api = axios.create({
-  baseURL: "http://localhost:3000/activities",
+  baseURL: "https://fitmeet.vercel.app",
 });
