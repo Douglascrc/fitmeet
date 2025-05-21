@@ -25,16 +25,28 @@ const s3 = new S3Client(clientConfig);
 
 export async function createBucket() {
   try {
+    console.log("Tentando criar bucket com config:", {
+      region,
+      bucketName,
+      hasAccessKey: !!process.env.ACCESS_KEY,
+      hasSecretKey: !!process.env.AWS_SECRET_ACCESS_KEY,
+    });
+
     await s3.send(new CreateBucketCommand({ Bucket: bucketName }));
     console.log("Bucket criado com sucesso.");
     await uploadDefaultAvatar();
   } catch (error: unknown) {
     if (error instanceof Error) {
+      console.error("Detalhes do erro:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      });
+
       if (error.name === "BucketAlreadyExists") {
         console.log("Bucket já existe, continuando...");
         return;
       }
-      console.error("Erro ao criar bucket:", error);
       throw error;
     }
     console.error("Erro desconhecido:", error);
