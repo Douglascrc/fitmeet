@@ -80,7 +80,7 @@ export async function uploadImage(file: Express.Multer.File) {
   };
 
   await s3.send(new PutObjectCommand(uploadParams));
-  // Precisa mudar isso para usar a URL do S3 real em produção
+
   return process.env.NODE_ENV === "production"
     ? `https://${bucketName}.s3.${region}.amazonaws.com/${file.originalname}`
     : `${process.env.S3_ENDPOINT}/${bucketName}/${file.originalname}`;
