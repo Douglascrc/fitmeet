@@ -22,7 +22,6 @@ server.use((req, res, next) => {
 });
 
 server.use(cors());
-createBucket();
 userController(server);
 authController(server);
 activityController(server);
@@ -31,6 +30,11 @@ const port = process.env.PORT;
 
 server.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
-server.listen(port, () => {
+server.listen(port, async () => {
   console.log(`Server listening on port ${port}`);
+  try {
+    await createBucket();
+  } catch (error) {
+    console.error("Erro ao criar bucket:", error);
+  }
 });
