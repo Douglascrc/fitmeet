@@ -8,9 +8,9 @@
     }
   ],
   "routes": [
-    { "src": "^/users(?:/.*)?$", "dest": "dist/index.js" },
-    { "src": "^/activities(?:/.*)?$", "dest": "dist/index.js" },
-    { "src": "^/auth(?:/.*)?$", "dest": "dist/index.js" },
+    { "src": "^/auth/.*", "dest": "dist/index.js" },
+    { "src": "^/users/.*", "dest": "dist/index.js" },
+    { "src": "^/activities/.*", "dest": "dist/index.js" },
     {
       "src": "/(.*)",
       "status": 301,
