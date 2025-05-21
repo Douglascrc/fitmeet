@@ -1,18 +1,27 @@
-import { CreateBucketCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+  CreateBucketCommand,
+  PutObjectCommand,
+  S3Client,
+  S3ClientConfig,
+} from "@aws-sdk/client-s3";
 import path from "path";
 import fs from "fs/promises";
 
 const bucketName = process.env.BUCKET_NAME!;
+const region = process.env.AWS_REGION!;
+const credentials = {
+  accessKeyId: process.env.ACCESS_KEY!,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+};
 
-const s3 = new S3Client({
-  region: process.env.AWS_REGION!,
-  endpoint: process.env.S3_ENDPOINT!,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-  forcePathStyle: true,
-});
+const clientConfig: S3ClientConfig = { region, credentials };
+
+if (process.env.NODE_ENV !== "production") {
+  clientConfig.endpoint = process.env.S3_ENDPOINT;
+  clientConfig.forcePathStyle = true;
+}
+
+const s3 = new S3Client(clientConfig);
 
 export async function createBucket() {
   await s3.send(new CreateBucketCommand({ Bucket: bucketName }));
