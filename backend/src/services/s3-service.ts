@@ -24,9 +24,22 @@ if (process.env.NODE_ENV !== "production") {
 const s3 = new S3Client(clientConfig);
 
 export async function createBucket() {
-  await s3.send(new CreateBucketCommand({ Bucket: bucketName }));
-  console.log("Bucket criado com sucesso.");
-  await uploadDefaultAvatar();
+  try {
+    await s3.send(new CreateBucketCommand({ Bucket: bucketName }));
+    console.log("Bucket criado com sucesso.");
+    await uploadDefaultAvatar();
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === "BucketAlreadyExists") {
+        console.log("Bucket já existe, continuando...");
+        return;
+      }
+      console.error("Erro ao criar bucket:", error);
+      throw error;
+    }
+    console.error("Erro desconhecido:", error);
+    throw new Error("Erro desconhecido ao criar bucket");
+  }
 }
 
 export async function uploadDefaultAvatar() {
@@ -55,5 +68,8 @@ export async function uploadImage(file: Express.Multer.File) {
   };
 
   await s3.send(new PutObjectCommand(uploadParams));
-  return `${process.env.S3_ENDPOINT}/${bucketName}/${file.originalname}`;
+  // Precisa mudar isso para usar a URL do S3 real em produção
+  return process.env.NODE_ENV === "production"
+    ? `https://${bucketName}.s3.${region}.amazonaws.com/${file.originalname}`
+    : `${process.env.S3_ENDPOINT}/${bucketName}/${file.originalname}`;
 }
