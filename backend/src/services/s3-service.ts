@@ -11,17 +11,10 @@ import {
 import fs from "fs";
 import path from "path";
 
-const region = process.env.AWS_REGION || "us-east-2";
-const bucketName = process.env.BUCKET_NAME || "douglascamposfitmeet";
+const region = process.env.AWS_REGION;
+const bucketName = process.env.BUCKET_NAME!;
 const accessKey = process.env.ACCESS_KEY;
 const secretKey = process.env.AWS_SECRET_ACCESS_KEY;
-
-console.log(`Tentando configurar bucket com config: {
-  region: '${region}',
-  bucketName: '${bucketName}',
-  hasAccessKey: ${Boolean(accessKey)},
-  hasSecretKey: ${Boolean(secretKey)}
-}`);
 
 if (!accessKey || !secretKey) {
   throw new Error("AWS credentials are not properly configured.");
@@ -96,7 +89,6 @@ async function configureBucketPublicAccess(bucketName: string) {
 
 export async function createBucket() {
   try {
-    console.log(`Verificando se o bucket '${bucketName}' já existe...`);
     await s3Client.send(new HeadBucketCommand({ Bucket: bucketName }));
     console.log(`O bucket '${bucketName}' já existe.`);
     await configureBucketPublicAccess(bucketName);
@@ -114,7 +106,6 @@ export async function createBucket() {
         err.message.includes("NoSuchBucket") ||
         err.message.includes("NotFound"))
     ) {
-      console.log(`O bucket '${bucketName}' não existe, tentando criar...`);
       try {
         await s3Client.send(
           new CreateBucketCommand({
@@ -159,19 +150,15 @@ export async function createBucket() {
 
 export async function uploadDefaultAvatar() {
   try {
-    console.log("Iniciando upload do avatar padrão...");
     const defaultImagePath = path.join(process.cwd(), "src", "tests", "mocks", "avatar.png");
 
-    console.log("Procurando arquivo em:", defaultImagePath);
     if (!fs.existsSync(defaultImagePath)) {
       console.error("Arquivo não encontrado!");
       return;
     }
 
-    console.log("Arquivo encontrado, lendo conteúdo...");
     const fileContent = fs.readFileSync(defaultImagePath);
 
-    console.log("Enviando para S3...");
     await s3Client.send(
       new PutObjectCommand({
         Bucket: bucketName,
