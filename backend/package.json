@@ -11,7 +11,7 @@
     "build": "tsc",
     "start": "node dist/api/index.js",
     "vercel-build": "prisma generate && prisma migrate deploy && npm run build && npm run init-bucket",
-    "init-bucket": "node dist/src/services/s3-service.js",
+    "init-bucket": "node dist/src/utils/init-bucket.js",
     "postinstall": "prisma generate"
   },
   "prisma": {
