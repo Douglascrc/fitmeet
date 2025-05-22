@@ -12,29 +12,24 @@ import path from "path";
 const swaggerPath = path.join(__dirname, "swagger.yaml");
 const swaggerFile = YAML.load(swaggerPath);
 
-export const server = express();
+const app = express();
 
-server.use((req, res, next) => {
+app.use((req, res, next) => {
   if (req.method === "GET") {
     return next();
   }
   return express.json()(req, res, next);
 });
 
-server.use(cors());
-userController(server);
-authController(server);
-activityController(server);
+app.use(cors());
+userController(app);
+authController(app);
+activityController(app);
 
-const port = process.env.PORT;
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
-server.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+createBucket()
+  .then(() => console.log("Bucket criado com sucesso!"))
+  .catch((err) => console.error("Erro ao criar bucket:", err));
 
-server.listen(port, async () => {
-  console.log(`Server listening on port ${port}`);
-  try {
-    await createBucket();
-  } catch (error) {
-    console.error("Erro ao criar bucket:", error);
-  }
-});
+export default app;
