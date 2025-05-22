@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "outputDirectory": "dist",
+  "builds": [
+    {
+      "src": "dist/api/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    { "src": "^/api/users(?:/.*)?$", "dest": "dist/api/index.js" },
+    { "src": "^/api/activities(?:/.*)?$", "dest": "dist/api/index.js" },
+    { "src": "^/api/auth(?:/.*)?$", "dest": "dist/api/index.js" },
+    { "src": "^/api/docs(?:/.*)?$", "dest": "dist/api/index.js" },
+    { "src": "^/api(?:/.*)?$", "dest": "dist/api/index.js" },
+    {
+      "src": "/(.*)",
+      "status": 301,
+      "headers": {
+        "Location": "https://fitmeet.vercel.app/$1"
+      }
+    }
+  ]
+}
