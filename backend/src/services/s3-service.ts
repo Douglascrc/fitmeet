@@ -6,6 +6,7 @@ import {
   PutBucketPolicyCommand,
   PutPublicAccessBlockCommand,
   BucketLocationConstraint,
+  ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
 import fs from "fs";
 import path from "path";
@@ -33,6 +34,24 @@ const s3Client = new S3Client({
     secretAccessKey: secretKey,
   },
 });
+
+async function isBucketEmpty(bucketName: string) {
+  try {
+    console.log(`Verificando se o bucket ${bucketName} está vazio`);
+    const response = await s3Client.send(
+      new ListObjectsV2Command({
+        Bucket: bucketName,
+        MaxKeys: 1,
+      })
+    );
+    const isEmpty = !response.Contents || response.Contents.length === 0;
+    console.log(`O bucket ${bucketName} está ${isEmpty ? "vazio" : "não vazio"}`);
+    return isEmpty;
+  } catch (error) {
+    console.error("Erro ao verificar se o bucket está vazio:", error);
+    throw error;
+  }
+}
 
 async function configureBucketPublicAccess(bucketName: string) {
   try {
@@ -81,6 +100,13 @@ export async function createBucket() {
     await s3Client.send(new HeadBucketCommand({ Bucket: bucketName }));
     console.log(`O bucket '${bucketName}' já existe.`);
     await configureBucketPublicAccess(bucketName);
+    const isEmpty = await isBucketEmpty(bucketName);
+    if (isEmpty) {
+      console.log("O bucket está vazio, fazendo upload do avatar padrão...");
+      await uploadDefaultAvatar();
+    }
+    console.log("Bucket já existe e está configurado.");
+    return;
   } catch (err) {
     if (
       err instanceof Error &&
