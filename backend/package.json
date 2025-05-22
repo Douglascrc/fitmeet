@@ -7,7 +7,7 @@
   "author": "Douglas Campos",
   "license": "ISC",
   "scripts": {
-    "dev": "nodemon src/index.ts",
+    "dev": "nodemon api/index.ts",
     "build": "tsc",
     "start": "node dist/api/index.js",
     "vercel-build": "prisma generate && prisma migrate deploy && npm run build && npm run init-bucket",
