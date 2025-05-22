@@ -9,7 +9,6 @@ import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 import path from "path";
 
-let bucketInitialized = false;
 let bucketInitializationPromise: Promise<void> | null = null;
 
 async function initializeBucket() {
@@ -20,34 +19,31 @@ async function initializeBucket() {
   bucketInitializationPromise = createBucket()
     .then(() => {
       console.log("Bucket criado com sucesso!");
-      bucketInitialized = true;
     })
     .catch((err) => {
       console.error("Erro ao criar bucket:", err);
-      // Não falhe completamente, apenas registre o erro
+      throw err;
     });
 
   return bucketInitializationPromise;
 }
 
-const swaggerPath = path.join(__dirname, "swagger.yaml");
-const swaggerFile = YAML.load(swaggerPath);
-
 const app = express();
 
+app.use(cors());
 app.use((req, res, next) => {
-  if (req.method === "GET") {
-    return next();
-  }
+  if (req.method === "GET") return next();
   return express.json()(req, res, next);
 });
 
-app.use(cors());
+initializeBucket();
+
 userController(app);
 authController(app);
 activityController(app);
 
+const swaggerPath = path.join(__dirname, "swagger.yaml");
+const swaggerFile = YAML.load(swaggerPath);
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
-initializeBucket();
 export default app;
