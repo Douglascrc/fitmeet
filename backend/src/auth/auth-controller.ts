@@ -46,7 +46,7 @@ const authController = (server: Express) => {
     }
   });
 
-  server.use("/auth", router);
+  server.use("api/auth", router);
 };
 
 export default authController;

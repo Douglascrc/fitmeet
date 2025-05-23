@@ -17,38 +17,6 @@ const userController = (server: Express) => {
   const router = Router();
   router.use(authGuard);
 
-  /**
-   * @swagger
-   * /user:
-   *   get:
-   *     summary: Retorna os dados do usuário autenticado
-   *     security:
-   *       - bearerAuth: []
-   *     responses:
-   *       200:
-   *         description: Dados do usuário retornados com sucesso
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 id:
-   *                   type: string
-   *                 name:
-   *                   type: string
-   *                 email:
-   *                   type: string
-   *                 cpf:
-   *                   type: string
-   *                 avatar:
-   *                   type: string
-   *                 xp:
-   *                   type: number
-   *                 level:
-   *                   type: number
-   *       401:
-   *         description: Autenticação necessária
-   */
   router.get("/", async (request, response) => {
     try {
       const userAuth = await getUserAuth(request.userId);
@@ -185,7 +153,7 @@ const userController = (server: Express) => {
     }
   });
 
-  server.use("/user", router);
+  server.use("api/user", router);
 };
 
 export default userController;
