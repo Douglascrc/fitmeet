@@ -153,7 +153,7 @@ const userController = (server: Express) => {
     }
   });
 
-  server.use("api/user", router);
+  server.use("/api/user", router);
 };
 
 export default userController;

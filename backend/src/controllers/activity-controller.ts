@@ -272,6 +272,6 @@ const activityController = (server: Express) => {
     }
   });
 
-  server.use("api/activities", router);
+  server.use("/api/activities", router);
 };
 export default activityController;
