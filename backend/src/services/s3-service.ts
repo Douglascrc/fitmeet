@@ -9,6 +9,7 @@ import {
   ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
 import fs from "fs";
+import "dotenv/config";
 import path from "path";
 
 const region = process.env.AWS_REGION;
@@ -30,7 +31,6 @@ const s3Client = new S3Client({
 
 async function isBucketEmpty(bucketName: string) {
   try {
-    console.log(`Verificando se o bucket ${bucketName} está vazio`);
     const response = await s3Client.send(
       new ListObjectsV2Command({
         Bucket: bucketName,
@@ -38,7 +38,7 @@ async function isBucketEmpty(bucketName: string) {
       })
     );
     const isEmpty = !response.Contents || response.Contents.length === 0;
-    console.log(`O bucket ${bucketName} está ${isEmpty ? "vazio" : "não vazio"}`);
+    console.log(`O bucket ${bucketName} está ${isEmpty ? "vazio" : "Com objetos"}`);
     return isEmpty;
   } catch (error) {
     console.error("Erro ao verificar se o bucket está vazio:", error);
@@ -90,7 +90,6 @@ async function configureBucketPublicAccess(bucketName: string) {
 export async function createBucket() {
   try {
     await s3Client.send(new HeadBucketCommand({ Bucket: bucketName }));
-    console.log(`O bucket '${bucketName}' já existe.`);
     await configureBucketPublicAccess(bucketName);
     const isEmpty = await isBucketEmpty(bucketName);
     if (isEmpty) {
