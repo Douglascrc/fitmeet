@@ -8,9 +8,10 @@
   "license": "ISC",
   "scripts": {
     "dev": "nodemon api/index.ts",
-    "build": "tsc",
+    "build": "tsc && cp src/swagger.yaml dist/src/swagger.yaml",
     "start": "node dist/api/index.js",
-    "vercel-build": "prisma generate && prisma migrate deploy && npm run build && npm run init-bucket",
+    "dev:prod": "npm run vercel-build && vercel dev --cwd ..",
+    "vercel-build": "prisma migrate deploy && npm run build && npm run init-bucket",
     "init-bucket": "node dist/src/utils/init-bucket.js",
     "postinstall": "prisma generate"
   },
@@ -40,7 +41,8 @@
     "ts-jest": "^29.2.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.27.0"
+    "typescript-eslint": "^8.27.0",
+    "vercel": "^42.1.1"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.772.0",
