@@ -1,4 +1,4 @@
-import { Express, Router } from "express";
+import { Router } from "express";
 import authGuard from "../middlewares/auth-guard";
 import {
   deactivate,
@@ -13,7 +13,7 @@ import updateValidation from "../validations/update-validation";
 import upload from "../multer/multer";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const userController = (server: Express) => {
+const userController = (app: Router) => {
   const router = Router();
   router.use(authGuard);
 
@@ -153,7 +153,7 @@ const userController = (server: Express) => {
     }
   });
 
-  server.use("/api/user", router);
+  app.use("/user", router);
 };
 
 export default userController;

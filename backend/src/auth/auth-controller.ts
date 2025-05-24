@@ -1,11 +1,11 @@
-import { Express, Router } from "express";
+import { Router } from "express";
 import { singIn, registerService } from "../auth/auth-service";
 import validateRequestBody from "../middlewares/request-validator";
 import authValidation from "../validations/auth-validation";
 import userValidation from "../validations/user-validation";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const authController = (server: Express) => {
+const authController = (app: Router) => {
   const router = Router();
 
   router.post("/register", validateRequestBody(userValidation), async (request, response) => {
@@ -46,7 +46,7 @@ const authController = (server: Express) => {
     }
   });
 
-  server.use("/api/auth", router);
+  app.use("/auth", router);
 };
 
 export default authController;

@@ -9,6 +9,7 @@ import YAML from "yamljs";
 import path from "path";
 
 const app = express();
+const apiRouter = express.Router();
 
 app.use(cors());
 app.use((req, res, next) => {
@@ -16,9 +17,11 @@ app.use((req, res, next) => {
   return express.json()(req, res, next);
 });
 
-userController(app);
-authController(app);
-activityController(app);
+userController(apiRouter);
+authController(apiRouter);
+activityController(apiRouter);
+
+app.use("/api", apiRouter);
 
 const swaggerPath = path.join(__dirname, "swagger.yaml");
 const swaggerFile = YAML.load(swaggerPath);

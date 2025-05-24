@@ -1,11 +1,11 @@
-import { Router, Express } from "express";
+import { Router } from "express";
 import authGuard from "../middlewares/auth-guard";
 import upload from "../multer/multer";
 import * as activityService from "../services/activity-service";
 import userStatus from "../middlewares/userStatus";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */ /* eslint-disable @typescript-eslint/no-unused-vars */
-const activityController = (server: Express) => {
+const activityController = (app: Router) => {
   const router = Router();
   router.use(authGuard);
   router.use(userStatus);
@@ -272,6 +272,6 @@ const activityController = (server: Express) => {
     }
   });
 
-  server.use("/api/activities", router);
+  app.use("/activities", router);
 };
 export default activityController;
