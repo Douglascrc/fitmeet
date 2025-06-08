@@ -14,8 +14,11 @@ RUN npx prisma generate
 
 RUN npm run build
 
-RUN cp src/swagger.yaml dist/src/swagger.yaml
-
 EXPOSE 3000
 
-CMD [ "npm", "start" ]
+CMD [ "sh", "-c", "\
+    npx prisma migrate deploy && \
+    npx prisma db seed && \
+    npm run init-bucket && \
+    npm start\
+  " ]
