@@ -48,7 +48,13 @@ export default function Home() {
 
       // Busca todas as atividades para "Recomendado para você"
       const recommendedResponse = await activities_api.get("/all");
-      setRecommendedActivities(recommendedResponse.data);
+      const data = recommendedResponse.data;
+
+      if (Array.isArray(data.activities)) {
+        setRecommendedActivities(data.activities);
+      } else {
+        setRecommendedActivities([]);
+      }
 
       // Se houver filtro, busca também as atividades filtradas
       if (filterTypeId || orderBy || order) {
@@ -153,7 +159,7 @@ export default function Home() {
               </Card>
             ))
           ) : (
-            <p>Nenhuma Atividade encontrada</p>
+            <p className="text-center text-gray-500">Nenhuma atividade recomendada no momento.</p>
           )}
         </div>
       </section>
