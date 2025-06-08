@@ -15,10 +15,10 @@ function App() {
       <BrowserRouter>
         <Toaster position="top-right" toastOptions={{ duration: 2000 }} />
         <Routes>
-          <Route path="/register" index element={<Register />} />
-          <Route path="/login" index element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
 
-          <Route path="/" index element={<Home />} />
+          <Route path="/" element={<Home />} />
 
           <Route path="" element={<PrivateRoutes />}>
             <Route path="/perfil" element={<Profile />} />
