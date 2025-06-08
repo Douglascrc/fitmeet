@@ -11,7 +11,7 @@
     "build": "tsc && cp src/swagger.yaml dist/src/swagger.yaml",
     "start": "node dist/api/index.js",
     "dev:prod": "npm run vercel-build && vercel dev --cwd ..",
-    "vercel-build": "prisma migrate deploy && npm run build && npm run init-bucket",
+    "vercel-build": "prisma migrate deploy && npm run build && npx prisma db seed && npm run init-bucket",
     "init-bucket": "node dist/src/utils/init-bucket.js",
     "postinstall": "prisma generate"
   },
@@ -21,7 +21,7 @@
   "devDependencies": {
     "@eslint/js": "^9.23.0",
     "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
+    "@types/express": "^5.0.2",
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/multer": "^1.4.12",
