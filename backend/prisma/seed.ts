@@ -1,34 +1,49 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { uploadImage } from "../src/services/s3-service";
+import fs from "fs";
+import path from "path";
+import { createActivity } from "../src/services/activity-service";
 
 const prisma = new PrismaClient();
 
 export async function main() {
   console.log("🌱 Populando o banco de dados...");
 
-  const activityTypesData = [
-    { name: "Esportes", description: "Atividades esportivas" },
-    { name: "Música", description: "Eventos musicais" },
+  const assetsDir = path.join(process.cwd(), "public", "assets");
+
+  const activityTypesMeta = [
+    { name: "Futebol", description: "Futebol", fileName: "futebol.jpg" },
+    { name: "Música", description: "Eventos musicais", fileName: "musica.jpg" },
+    { name: "Tecnologia", description: "Workshops e palestras", fileName: "tecnologia.jpg" },
     {
-      name: "Tecnologia",
-      description: "Workshops e palestras sobre tecnologia",
+      name: "Basquete",
+      description: "Partidas amistosas ou competitivas",
+      fileName: "basquete.jpg",
     },
-    { name: "Artes Visuais", description: "Exposições e oficinas de arte" },
+    { name: "Vôlei", description: "Partidas de vôlei", fileName: "volei.jpg" },
     {
-      name: "Teatro",
-      description: "Apresentações teatrais e oficinas de interpretação",
+      name: "Caminhada",
+      description: "Caminhadas em parques ou trilhas",
+      fileName: "caminhada.jpg",
     },
-    { name: "Culinária", description: "Workshops e eventos gastronômicos" },
-    {
-      name: "Viagens",
-      description: "Palestras e eventos sobre destinos turísticos",
-    },
-    {
-      name: "Literatura",
-      description: "Clubes de leitura e lançamentos de livros",
-    },
-    { name: "Moda", description: "Desfiles e workshops de estilo" },
   ];
+
+  const activityTypesData = await Promise.all(
+    activityTypesMeta.map(async ({ name, description, fileName }) => {
+      const imagePath = path.join(assetsDir, fileName);
+      if (!fs.existsSync(imagePath)) {
+        throw new Error(`Imagem não encontrada: ${fileName}`);
+      }
+      const file = {
+        originalname: fileName,
+        buffer: fs.readFileSync(imagePath),
+        mimetype: fileName.endsWith(".jpg") ? "image/png" : "image/jpeg",
+      } as Express.Multer.File;
+      const image = await uploadImage(file);
+      return { name, description, image };
+    })
+  );
 
   for (const type of activityTypesData) {
     await prisma.activityType.upsert({
@@ -37,18 +52,18 @@ export async function main() {
       create: type,
     });
   }
-
   console.log("Tipos de atividades criados");
 
   const achievementsData = [
     {
-      name: "Primeiro Check-in",
-      criterion: "Fez check-in em uma atividade pela primeira vez",
+      name: "Convidado",
+      criterion: "Faça check-in em uma atividade pela primeira vez.",
     },
     {
-      name: "Criador de Atividades",
-      criterion: "Criou uma atividade pela primeira vez",
+      name: "Fine, I'll do it myself",
+      criterion: "Crie uma atividade pela primeira vez.",
     },
+    { name: "Anfitrião", criterion: "Conclua uma atividade pela primeira vez." },
     { name: "Explorador", criterion: "Participou de 5 atividades diferentes" },
     { name: "Nível Up", criterion: "Alcançou o nível 5" },
     { name: "Jogador", criterion: "Alcançou o nível 10" },
@@ -111,45 +126,49 @@ export async function main() {
   if (activityTypes2.length > 0) {
     const sampleActivities = [
       {
-        title: "Nadar 100m rasos",
+        title: "Partida amistosa de basquete",
         description: "Uma atividade de esportes",
-        typeId: activityTypes2[0].id,
-        confirmationCode: "ABC123",
-        scheduledDate: new Date("2025-03-20T18:00:00Z"),
+        typeId: activityTypes2[3].id,
+        scheduledDate: new Date().toISOString(),
         private: false,
-        creatorId: user.id,
+        image: "sport-basquete.jpg",
         address: { latitude: -23.55, longitude: -46.63 },
       },
       {
-        title: "Tocar violão",
+        title: "Show de violão",
         description: "Uma atividade de música",
         typeId: activityTypes2[1].id,
-        confirmationCode: "DEF456",
-        scheduledDate: new Date("2025-04-15T20:00:00Z"),
+        scheduledDate: new Date().toISOString(),
         private: true,
-        creatorId: user2.id,
+        image: "show-violao.jpg",
         address: { latitude: -22.9, longitude: -43.2 },
       },
     ];
 
     for (const a of sampleActivities) {
-      await prisma.activity.create({
-        data: {
+      const imagePath = path.join(assetsDir, a.image);
+      if (!fs.existsSync(imagePath)) {
+        throw new Error(`Imagem não encontrada: ${a.image}`);
+      }
+      const file = {
+        originalname: a.image,
+        buffer: fs.readFileSync(imagePath),
+        mimetype: a.image.endsWith(".jpg") ? "image/jpeg" : "image/png",
+      } as Express.Multer.File;
+
+      await createActivity(
+        user.id,
+        {
           title: a.title,
           description: a.description,
           typeId: a.typeId,
-          confirmationCode: a.confirmationCode,
           scheduledDate: a.scheduledDate,
           private: a.private,
-          creatorId: a.creatorId,
-          address: {
-            create: {
-              latitude: a.address.latitude,
-              longitude: a.address.longitude,
-            },
-          },
+          latitude: a.address.latitude,
+          longitude: a.address.longitude,
         },
-      });
+        file
+      );
     }
     console.log("Atividades criadas");
   }
@@ -172,6 +191,8 @@ export async function main() {
     });
   }
   console.log("Seed finalizado com sucesso!");
+
+  console.log("Banco de dados populado com sucesso!");
 }
 
 main()
